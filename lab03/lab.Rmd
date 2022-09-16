@@ -2,13 +2,13 @@
 title: "Lab 03"
 author: "sl"
 date: "`r Sys.Date()`"
-output: html_document
+output: github_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
 
 ## Step 1. Read in the data
 First download and then read in with data.table:fread()
