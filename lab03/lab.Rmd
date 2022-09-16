@@ -1,0 +1,119 @@
+---
+title: "Lab 03"
+author: "sl"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Step 1. Read in the data
+First download and then read in with data.table:fread()
+
+```{r}
+if(!file.exists("met_all.gz")){
+  download.file("https://raw.githubusercontent.com/USCbiostats/data-science-data/master/02_met/met_all.gz", "met_all.gz", method="libcurl", timeout = 60)
+}
+
+met <- data.table::fread("met_all.gz")
+```
+
+## 2. Check the dimensions, headers, footers. How many columns, rows are there?
+
+```{r}
+dim(met)
+head(met)
+tail(met)
+```
+
+## Step 3. Take a look at the variables.
+```{r}
+str(met)
+```
+
+## Step 4. Take a closer look at the key variables.
+```{r}
+table(met$year)
+```
+```{r}
+table(met$day)
+```
+
+```{r}
+table(met$hour)
+```
+
+```{r}
+summary(met$temp)
+summary(met$wind.sp)
+```
+
+```{r}
+summary(met$elev)
+```
+
+
+Replace elevations with 9999 as NA.
+
+```{r}
+met[met$elev==9999.0] <- NA
+summary(met$elev)
+```
+
+The weather station with the highest elevation is at `r max(met$elev, na.rm=TRUE)` meters.
+
+Remove temps below -40 celcius.
+
+```{r}
+met <- met[temp>-40][order(temp)]
+```
+
+```{r}
+met <- met[temp>-15][order(temp)]
+```
+
+## Step 5. Check the data against an external data source.
+
+```{r}
+met <- met[temp>-15]
+met2 <- met[order(temp)]
+head(met2)
+```
+
+## Step 6. Calculate summary statistics
+
+```{r}
+met[elev==max(elev, na.rm=TRUE), summary(wind.sp)]
+met[elev==max(elev, na.rm=TRUE), summary(temp)]
+```
+
+```{r}
+met[elev==max(elev,na.rm=TRUE), .(
+  temp_wind = cor(temp,wind.sp,use = "complete"),
+  temp_hour = cor(temp,hour,use = "complete"),
+  wind.sp_day = cor(wind.sp,day,use = "complete"),
+  wind.sp_hour = cor(wind.sp,hour,use = "complete")
+)]
+```
+
+## Step 7. Exploratory graphs
+
+Look ar key variables
+
+```{r}
+hist(met$elev, breaks=100)
+```
+
+```{r}
+library(leaflet)
+elev <- met[elev==max(elev)]
+```
+
+```{r}
+#leaflet(elev) %>%
+#  addProviderTiles('OpenStreetMap') %>% 
+#  addCircles(lat=~lat,lng=~lon, opacity=1, fillOpacity=1, radius=100)
+```
