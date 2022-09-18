@@ -1,7 +1,12 @@
 Lab 03
 ================
 sl
-2022-09-16
+2022-09-17
+
+``` r
+library(leaflet)
+library(webshot)
+```
 
 ## Step 1. Read in the data
 
@@ -286,7 +291,9 @@ elev <- met[elev==max(elev)]
 ```
 
 ``` r
-#leaflet(elev) %>%
-#  addProviderTiles('OpenStreetMap') %>% 
-#  addCircles(lat=~lat,lng=~lon, opacity=1, fillOpacity=1, radius=100)
+leaflet(elev) %>%
+  addProviderTiles('OpenStreetMap') %>% 
+  addCircles(lat=~lat,lng=~lon, opacity=1, fillOpacity=1, radius=100)
 ```
+
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->

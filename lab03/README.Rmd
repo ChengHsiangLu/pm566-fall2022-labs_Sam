@@ -10,6 +10,12 @@ always_allow_html: true
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r library}
+library(leaflet)
+library(webshot)
+```
+
+
 ## Step 1. Read in the data
 First download and then read in with data.table:fread()
 
@@ -113,7 +119,7 @@ elev <- met[elev==max(elev)]
 ```
 
 ```{r}
-#leaflet(elev) %>%
-#  addProviderTiles('OpenStreetMap') %>% 
-#  addCircles(lat=~lat,lng=~lon, opacity=1, fillOpacity=1, radius=100)
+leaflet(elev) %>%
+  addProviderTiles('OpenStreetMap') %>% 
+  addCircles(lat=~lat,lng=~lon, opacity=1, fillOpacity=1, radius=100)
 ```
