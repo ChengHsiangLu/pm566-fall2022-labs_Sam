@@ -149,7 +149,7 @@ rh.pal <- colorNumeric(c('darkgreen','goldenrod','brown'), domain=met_avg$rh)
 rh.pal
 ```
 
-Use addMarkers to include the top 10 places in relative h (hint: this will be useful rank(-rh) <= 10)
+Use addMarkers to include the top 10 places in relative h (hint: this will be useful rank(-rh) <= 10) 
 
 ```{r}
 met_avg[rank(-rh)<= 10]
