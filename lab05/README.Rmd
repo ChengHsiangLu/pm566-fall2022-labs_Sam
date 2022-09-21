@@ -1,0 +1,132 @@
+---
+title: "lab05"
+author: "sl"
+date: "`r Sys.Date()`"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(webshot)
+library(lubridate)
+library(tidyverse)
+library(leaflet)
+library(data.table)
+library(dtplyr)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/lab05/")
+```
+
+## Step1: Read in the data
+```{r read-data, cashe=TRUE}
+if (!file.exists("../lab03/met_all.gz"))
+  download.file(
+    url = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/02_met/met_all.gz",
+    destfile = "met_all.gz",
+    method   = "libcurl",
+    timeout  = 60
+    )
+met <- data.table::fread("../lab03/met_all.gz")
+```
+
+Read in station data
+
+```{r stations, cashe=TRUE}
+# Download the data
+stations <- fread("ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv")
+stations[, USAF := as.integer(USAF)]
+
+# Dealing with NAs and 999999
+stations[, USAF   := fifelse(USAF == 999999, NA_integer_, USAF)]
+stations[, CTRY   := fifelse(CTRY == "", NA_character_, CTRY)]
+stations[, STATE  := fifelse(STATE == "", NA_character_, STATE)]
+
+# Selecting the three relevant columns, and keeping unique records
+stations <- unique(stations[, list(USAF, CTRY, STATE)])
+
+# Dropping NAs
+stations <- stations[!is.na(USAF)]
+
+# Removing duplicates
+stations[, n := 1:.N, by = .(USAF)]
+stations <- stations[n == 1,][, n := NULL]
+```
+
+Remove temperatures less than -17C. Make sure there are no missing data in the key variables coded as 9999, 999, etc
+
+```{r remove-low-temp}
+met <- met[met$temp > -17][elev == 9999.0, elev:=NA]
+```
+
+Merge met data with stations.
+
+```{r merge-datatables}
+met <- 
+  merge(
+  # Data
+  x     = met,      
+  y     = stations, 
+  # List of variables to match
+  by.x  = "USAFID",
+  by.y  = "USAF", 
+  # Which obs to keep?
+  all.x = TRUE,      
+  all.y = FALSE
+  ) 
+```
+
+## Question 1: Representative station for the US
+
+Compute mean temp, wind.sp and atm.ps for each weather station, and pick the weather station with the average value closet to the median for the US.
+
+```{r}
+station_avg <-
+  met[ , .(
+    temp = mean(temp, na.rm = T),
+    wind.sp = mean(wind.sp, na.rm = T),
+    atm.press = mean(atm.press, na.rm = T)
+  ), by = USAFID]
+```
+
+The above computes the mean by weather station.
+Now let's compute the median value for each variable.
+
+```{r}
+stmeds <- station_avg[ , .(
+  temp50 = median(temp, na.rm = T),
+  windsp50 = median(wind.sp, na.rm = T),
+  atmpress50 = median(atm.press, na.rm = T)
+)]
+```
+
+A helpful function we might want to use 'which.min()'.
+
+```{r}
+station_avg[ ,
+        temp_dist50 := abs(temp - stmeds$temp50)][order(temp_dist50)]
+
+```
+
+Let's use which.min
+
+```{r}
+station_avg[ which.min(temp_dist50)]
+```
+
+It matches the result above.
+
+
+
+
+
+
+
+
