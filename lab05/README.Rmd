@@ -123,6 +123,58 @@ station_avg[ which.min(temp_dist50)]
 
 It matches the result above.
 
+## Question 2: Representative station per state
+
+Just like the previous question, you are asked to identify what is the most representative, the median, station per state. This time, instead of looking at one variable at a time, look at the euclidean distance. If multiple stations show in the median, select the one located at the lowest latitude.
+
+```{r}
+station_avg <-
+  met[ , .(
+    temp = mean(temp, na.rm = T),
+    wind.sp = mean(wind.sp, na.rm = T),
+    atm.press = mean(atm.press, na.rm = T)
+  ), by = .(USAFID, STATE)]
+head(station_avg)
+```
+
+```{r}
+statemeds <- station_avg[ , .(
+    temp50 = median(temp, na.rm = T),
+    windsp50 = median(wind.sp, na.rm = T)
+), by = STATE][order(STATE)]
+
+statemeds
+```
+
+```{r}
+ station_avg <- merge(
+  x = station_avg,
+  y = statemeds,
+  by.x = "STATE",
+  by.y = "STATE",
+  all.x = TRUE,
+  all.y = FALSE
+)
+
+```
+
+```{r}
+station_avg[ , temp_dist_state50 := temp - temp50 ]
+station_avg[ , windsp_dist_state50 := wind.sp - windsp50]
+
+station_avg
+```
+
+```{r}
+station_avg[, eucdist := temp_dist_state50^2 +
+              windsp_dist_state50^2]
+station_avg[, .(
+  rep50 = min(eucdist))
+  , by = STATE]
+
+```
+
+
 
 
 
