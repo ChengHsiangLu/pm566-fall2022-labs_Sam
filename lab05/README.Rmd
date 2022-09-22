@@ -179,11 +179,11 @@ repstation <- station_avg[, .(
 ```
 
 ```{r}
-merge(
+test <- merge(
   x = station_avg,
   y = repstation,
-  by.x = eucdist,
-  by.y = eucdist,
+  by.x = c("eucdist", "STATE"),
+  by.y = c("eucdist", "STATE"),
   all.x = FALSE,
   all.y = TRUE
 )
