@@ -1,0 +1,311 @@
+---
+title: "assignment01"
+author: "sl"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r library}
+library(webshot)
+library(lubridate)
+library(tidyverse)
+library(data.table)
+library(leaflet)
+```
+
+## Step 1. Conduct EDA Checklist items 2-4
+### Read in the data - 2004 and 2019
+```{r}
+setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/assignments/assignment01/")
+data_2004 <- data.table::fread("ad_viz_plotval_data_2004.csv")
+data_2019 <- data.table::fread("ad_viz_plotval_data_2019.csv")
+```
+### Check the dimensions and headers and footers of the data
+```{r}
+dim(data_2004)
+head(data_2004)
+tail(data_2004)
+```
+```{r}
+dim(data_2019)
+head(data_2019)
+tail(data_2019)
+```
+### Check the variable types in the data
+```{r}
+str(data_2004)
+```
+```{r}
+str(data_2019)
+```
+
+### Check for any data issues, particularly in the key variable we are analyzing
+```{r}
+#table(data_2004$Date)
+#table(data_2004$`Site Name`)
+#table(data_2004$CBSA_NAME)
+#table(data_2004$STATE)
+table(data_2004$COUNTY)
+```
+```{r}
+#table(data_2019$Date)
+#table(data_2019$`Site Name`)
+#table(data_2019$CBSA_NAME)
+#table(data_2019$STATE)
+table(data_2019$COUNTY)
+```
+
+```{r}
+summary(data_2004$`Daily Mean PM2.5 Concentration`)
+#summary(data_2004$CBSA_CODE) #1253 NA's
+#summary(data_2004$COUNTY_CODE)
+#summary(data_2004$SITE_LATITUDE)
+#summary(data_2004$SITE_LONGITUDE)
+```
+```{r}
+summary(data_2019$`Daily Mean PM2.5 Concentration`)
+#summary(data_2019$CBSA_CODE) #4181 NA's
+#summary(data_2019$COUNTY_CODE)
+#summary(data_2019$SITE_LATITUDE)
+#summary(data_2019$SITE_LONGITUDE)
+```
+
+There are 1253 NAs in CBSA_CODE of data_2004 and 4181 NAs in CBSA_CODE of data_2019. However, it is strange to have negative values of PM2.5.
+
+## Step 2. Combine the two years of data into one data frame. Use the Date variable to create a new column for year, which will serve as an identifier. 
+```{r}
+data_2004$Year <- "2004"
+data_2019$Year <- "2019"
+data_2004_2019 <- rbind(data_2004, data_2019) 
+```
+
+### Change the names of the key variables so that they are easier to refer to in your code.
+```{r}
+colnames(data_2004_2019)[5] <- "pm2.5"
+colnames(data_2004_2019)[19] <- "lat"
+colnames(data_2004_2019)[20] <- "lon"
+```
+```{r}
+colnames(data_2004)[5] <- "pm2.5"
+colnames(data_2004)[19] <- "lat"
+colnames(data_2004)[20] <- "lon"
+
+colnames(data_2019)[5] <- "pm2.5"
+colnames(data_2019)[19] <- "lat"
+colnames(data_2019)[20] <- "lon"
+```
+
+## Step 3. Create a basic map in leaflet() that shows the locations of the sites (make sure to use different colors for each year). 
+
+```{r}
+leaflet() %>% 
+  # The looks of the Map
+  addProviderTiles('CartoDB.Positron') %>% 
+  # Some circles
+  addCircles(
+    data = unique(data_2004_2019[Year == "2004"]),
+    lat = ~lat, lng=~lon,
+    color = "blue",
+    opacity = 0.1, fillOpacity = 1, radius = 500
+    ) %>% 
+  addCircles(
+    data = unique(data_2004_2019[Year == "2019"]),
+    lat = ~lat, lng=~lon,
+    color = "red",
+    opacity = 0.1, fillOpacity = 1, radius = 100
+    )
+```
+
+```{r}
+leaflet() %>%
+  addProviderTiles('OpenStreetMap') %>% 
+  addCircles(data = unique(data_2004_2019[Year =="2004"]), 
+             lat=~lat,lng=~lon, 
+             color = "blue",
+             opacity = 0.1, fillOpacity = 1, radius = 500) %>% 
+  addCircles(data = unique(data_2004_2019[Year =="2019"]), 
+             lat=~lat,lng=~lon, 
+             color = "red",
+             opacity = 0.1, fillOpacity = 1, radius = 100)
+```
+###  Summarize the spatial distribution of the monitoring sites.
+
+It seems that there are more monitoring sites in the bit cities like San Jose, LA, San Francisco and San Diego.
+
+## Step 4. Check for any missing or implausible values of PM2.5 in the combined dataset
+```{r}
+summary(data_2004_2019$pm2.5)
+```
+
+```{r}
+nrow(data_2004_2019[pm2.5 <0])
+```
+
+There is no missing values of PM2.5 in the combined dataset. However, it is implausible to have negative value of PM2.5. Therefore, I'm going to replace negative values into NA.
+
+```{r}
+data_2004_2019[data_2004_2019$pm2.5 <0] <- NA
+summary(data_2004_2019$pm2.5)
+```
+
+### Explore the proportions of each and provide a summary of any temporal patterns you see in these observations.
+
+```{r}
+length(unique(data_2004_2019[Year ==2004]$`Site ID`))
+length(unique(data_2004_2019[Year ==2019]$`Site ID`))
+```
+
+```{r}
+mean(data_2004_2019[Year ==2004]$pm2.5)
+mean(data_2004_2019[Year ==2019]$pm2.5)
+```
+
+
+Monitoring sites were getting more and more. In 2019, the total mean pm2.5 level was lower than in 2004.
+
+## Step 5. Explore the main question of interest at three different spatial levels(state, county, site in Los Angeles)
+### Create exploratory plots (e.g.boxplots, histograms, line plots)
+### summary statistics that best suit each level of data
+### Be sure to write up explanations of what you observe in these data.
+
+First, I create 2004 and 2019 datasets with Date, STATE, COUNTY, Site Name, pm2.5, lat, and lon by Site ID.
+```{r avg}
+data_2004_avg <- data_2004[, .(
+  Date = Date,
+  STATE = STATE,
+  COUNTY = COUNTY,
+  `Site Name` =`Site Name`,
+  pm2.5 = mean(pm2.5, na.rm = T),
+  lat = mean(lat, na.rm = T), 
+  lon = mean(lon, na.rm = T)
+), by="Site ID"]
+
+data_2004_avg$year <- "2004"
+```
+```{r}
+data_2019_avg <- data_2019[, .(
+  Date = Date,
+  STATE = STATE,
+  COUNTY = COUNTY,
+  `Site Name` =`Site Name`,
+  pm2.5 = mean(pm2.5, na.rm = T),
+  lat = mean(lat, na.rm = T), 
+  lon = mean(lon, na.rm = T)
+), by="Site ID"]
+
+data_2019_avg$year <- "2019"
+```
+
+Second, I merged two datasets.
+
+```{r}
+data_0419 <- rbind(data_2004_avg, data_2019_avg)
+```
+
+Add one column of region.
+```{r}
+data_0419[, region := fifelse(lon >= -98 & lat > 39.71, "NE",
+                fifelse(lon < -98 & lat > 39.71, "NW",
+                fifelse(lon < -98 & lat <= 39.71, "SW","SE")))
+   ]
+table(data_0419$region)
+```
+
+Add on column of pm_health (pm2.5 <= 12 is labeled as health).
+```{r}
+data_0419[, pm_health := fifelse(pm2.5 <= 12, "healthy",
+                         fifelse(pm2.5 > 12 & pm2.5 < 35, "normal", "unhealthy"))]
+
+table(data_0419$pm_health)
+```
+
+### Box plots
+
+```{r}
+data_0419[STATE == "California"] %>% 
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = year, y = pm2.5, color=pm_health, fill = pm_health)) + 
+  facet_wrap(~ region, nrow = 1)
+```
+
+In California, southwestern region pm2.5 level is higher than northwestern region.
+
+```{r}
+data_0419[COUNTY == "Los Angeles"] %>% 
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = year, y = pm2.5, color=pm_health, fill = pm_health)) + 
+  facet_wrap(~ region, nrow = 1)
+```
+
+In Los Angeles, pm2.5 level is higher in 2004 than in 2019.
+
+```{r}
+data_0419[`Site Name` == "Los Angeles-North Main Street"] %>% 
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = year, y = pm2.5, color=pm_health, fill = pm_health)) + 
+  facet_wrap(~ region, nrow = 1)
+```
+
+In the Los Angeles-North Main Street, pm2.5 level turns into healthy in 2019.
+
+### Violin plots
+```{r}
+ggplot(data = data_0419[STATE == "California"], aes(x=year, y=pm2.5, color=pm_health, fill = pm_health)) +
+ geom_violin() +
+ geom_point() +
+ facet_wrap(~ region, nrow = 1)
+```
+
+California pm2.5 level is lower in 2019 than in 2004 in both northwestern and southwestern.
+
+```{r}
+ggplot(data = data_0419[COUNTY == "Los Angeles"], aes(x=year, y=pm2.5, color=pm_health, fill = pm_health)) +
+ geom_violin() +
+ geom_point() +
+ facet_wrap(~ region, nrow = 1)
+```
+
+In Los Angeles, most pm2.5 levels is healthier in 2019 than in 2004.
+
+```{r}
+ggplot(data = data_0419[`Site Name` == "Los Angeles-North Main Street"], aes(x=year, y=pm2.5, color=pm_health, fill = pm_health)) +
+ geom_violin() +
+ geom_point()
+```
+
+On main street in LA, its pm2.5 level used to be higher in 2004 but it's within the healthy range in 2019.
+
+### Histograms
+```{r}
+ggplot(data = data_0419[STATE == "California"], aes(x=pm2.5, color=year, fill = year)) +
+  geom_histogram(fill="white", alpha=0.5, position="identity") +
+   facet_wrap(~ region, nrow = 1)
+```
+
+In this histogram, there are more data in southwestern region than in northwestern region.
+
+```{r}
+ggplot(data = data_0419[COUNTY == "Los Angeles"], aes(x=pm2.5, color=year, fill = year)) +
+  geom_histogram(fill="white", alpha=0.5, position="identity") +
+  facet_wrap(~ region, nrow = 1)
+```
+
+In Los Angeles, there are more counts in the range of 15 to 20 in 2004 than in 2019.
+
+```{r}
+ggplot(data = data_0419[`Site Name` == "Los Angeles-North Main Street"], aes(x=pm2.5, color=year, fill = year)) +
+  geom_histogram(fill="white", alpha=0.5, position="identity") +
+  facet_wrap(~ region, nrow = 1)
+```
+
+On the North Main Street, its used to get pm2.5 levels around 20 in 2004. However, it is lower in 2019.
+
+## Whether daily concentrations of PM2.5 have decreased in California over the last 15 years (from 2004 to 2019)
+
+From above data and plots, I would say that the daily concentrations of p2.5 have decreased in California over the last 15 years.
+
+
