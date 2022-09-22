@@ -115,7 +115,7 @@ station_avg[ ,
 
 ```
 
-Let's use which.min
+Let's use which.min 
 
 ```{r}
 station_avg[ which.min(temp_dist50)]
