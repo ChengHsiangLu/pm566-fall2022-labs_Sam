@@ -147,7 +147,8 @@ statemeds
 ```
 
 ```{r}
- station_avg <- merge(
+ station_avg <- 
+  merge(
   x = station_avg,
   y = statemeds,
   by.x = "STATE",
@@ -168,13 +169,25 @@ station_avg
 ```{r}
 station_avg[, eucdist := temp_dist_state50^2 +
               windsp_dist_state50^2]
-station_avg[, .(
-  rep50 = min(eucdist))
+```
+
+```{r}
+repstation <- station_avg[, .(
+  eucdist = min(eucdist, na.rm = T))
   , by = STATE]
 
 ```
 
-
+```{r}
+merge(
+  x = station_avg,
+  y = repstation,
+  by.x = eucdist,
+  by.y = eucdist,
+  all.x = FALSE,
+  all.y = TRUE
+)
+```
 
 
 
