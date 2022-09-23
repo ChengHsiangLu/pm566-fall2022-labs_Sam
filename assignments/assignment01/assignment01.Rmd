@@ -18,6 +18,7 @@ library(leaflet)
 ```
 
 ## Step 1. Conduct EDA Checklist items 2-4
+
 ### Read in the data - 2004 and 2019
 ```{r}
 setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/assignments/assignment01/")
