@@ -2,7 +2,8 @@
 title: "assignment01"
 author: "sl"
 date: "`r Sys.Date()`"
-output: html_document
+output: github_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
