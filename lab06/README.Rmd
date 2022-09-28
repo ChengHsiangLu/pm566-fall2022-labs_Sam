@@ -1,0 +1,66 @@
+---
+title: "lab06"
+author: "sl"
+date: "`r Sys.Date()`"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r install-libraries}
+library(tidytext)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(forcats)
+```
+
+```{r}
+setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/lab06/")
+```
+
+## Step1: Read in the data
+First download and then read in with read.csv()
+
+```{r read-data, cashe=TRUE}
+if (!file.exists("mtsamples.csv"))
+  download.file(
+    url = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/00_mtsamples/mtsamples.csv",
+    destfile = "mtsamples.csv",
+    method   = "libcurl",
+    timeout  = 60
+    )
+mts <- read.csv("mtsamples.csv")
+str(mts)
+mts <- as_tibble(mts)
+mts
+```
+
+## Question 1: What specialties do we have?
+We can use count() from dplyr to figure out how many records are there per specialty?
+
+```{r medical-specialties}
+spec <- mts %>%
+    count(medical_specialty)
+
+spec %>%
+    arrange(desc(n)) %>%
+knitr::kable()
+```
+
+There are `nrows(specialties)` mdeical specialties.
+
+```{r barplot-of-specialty-counts}
+spec %>%
+  top_n(10) %>%
+  ggplot(aes(x = n, y = fct_reorder(medical_specialty, n ))) +
+    geom_col()
+```
+
+The distribution is not at all uniform.
+
+
+
