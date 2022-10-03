@@ -1,7 +1,7 @@
 assignment02
 ================
 sl
-2022-10-02
+2022-10-03
 
 ``` r
 library(lubridate)
@@ -74,20 +74,20 @@ reg <- data.table::fread("chs_regional.csv")
 ```
 
 ``` r
-ind[, sid := as.integer(sid)]
+#ind[, sid := as.integer(sid)]
 
-# Dealing with NAs
-reg[, townname   := fifelse(townname == "", NA_character_, townname)]
+## Dealing with NAs
+#reg[, townname   := fifelse(townname == "", NA_character_, townname)]
 
-# Selecting the three relevant columns, and keeping unique records
-reg <- unique(reg[, list(townname, pm25_mass, lon, lat)])
+## Selecting the three relevant columns, and keeping unique records
+#reg <- unique(reg[, list(townname, pm25_mass, lon, lat)])
 
-# Dropping NAs
-reg <- reg[!is.na(townname)]
+## Dropping NAs
+#reg <- reg[!is.na(townname)]
 
-# Removing duplicates
-reg[, n := 1:.N, by = .(townname)]
-reg <- reg[n == 1,][, n := NULL]
+## Removing duplicates
+#reg[, n := 1:.N, by = .(townname)]
+#reg <- reg[n == 1,][, n := NULL]
 ```
 
 ``` r
@@ -100,7 +100,7 @@ dim(ind)
 dim(reg)
 ```
 
-    ## [1] 12  4
+    ## [1] 12 27
 
 ## Merge data
 
@@ -112,7 +112,7 @@ merged <-
   y     = reg, 
   # List of variables to match
   by  = "townname",
-  # Which obs to keep?
+  # keep everything!
   all.x = TRUE,      
   all.y = TRUE
   ) 
@@ -124,7 +124,7 @@ merged <-
 dim(merged)
 ```
 
-    ## [1] 1200   26
+    ## [1] 1200   49
 
 ### ?In the case of missing values, impute data using the average within the variables “male” and “hispanic.”
 
@@ -162,6 +162,8 @@ summary(merged$fev)
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##   984.8  1827.6  2016.4  2030.1  2223.6  3323.7
+
+Turn NAs into means.
 
 ## Step2: Create a new categorical variable named “obesity_level” using the BMI measurement (underweight BMI\<14; normal BMI 14-22; overweight BMI 22-24; obese BMI\>24). To make sure the variable is rightly coded, create a summary table that contains the minimum BMI, maximum BMI, and the total number of observations per category.
 
@@ -287,7 +289,7 @@ association between PM2.5 exposure and FEV?
 dim(merged)
 ```
 
-    ## [1] 1200   28
+    ## [1] 1200   51
 
 ``` r
 head(merged)
@@ -314,13 +316,27 @@ head(merged)
     ## 4:          NA    NA    0       NA 2466.791 2638.221 3466.464      8.74
     ## 5:           5     0    1        0 2251.505 2594.649 2445.151      8.74
     ## 6:           1     1    1        0 2188.716 2423.934 2524.599      8.74
-    ##          lon      lat obesity_level smoke_gas_exposure
-    ## 1: -116.7664 32.83505        normal               none
-    ## 2: -116.7664 32.83505        normal               <NA>
-    ## 3: -116.7664 32.83505        normal              smoke
-    ## 4: -116.7664 32.83505        normal               <NA>
-    ## 5: -116.7664 32.83505        normal               none
-    ## 6: -116.7664 32.83505        normal              smoke
+    ##    pm25_so4 pm25_no3 pm25_nh4 pm25_oc pm25_ec pm25_om pm10_oc pm10_ec pm10_tc
+    ## 1:     1.73     1.59     0.88    2.54    0.48    3.04    3.25    0.49    3.75
+    ## 2:     1.73     1.59     0.88    2.54    0.48    3.04    3.25    0.49    3.75
+    ## 3:     1.73     1.59     0.88    2.54    0.48    3.04    3.25    0.49    3.75
+    ## 4:     1.73     1.59     0.88    2.54    0.48    3.04    3.25    0.49    3.75
+    ## 5:     1.73     1.59     0.88    2.54    0.48    3.04    3.25    0.49    3.75
+    ## 6:     1.73     1.59     0.88    2.54    0.48    3.04    3.25    0.49    3.75
+    ##    formic acetic  hcl hno3 o3_max o3106 o3_24   no2  pm10 no_24hr pm2_5_fr
+    ## 1:   1.03   2.49 0.41 1.98  65.82 55.05 41.23 12.18 24.73    2.48    10.28
+    ## 2:   1.03   2.49 0.41 1.98  65.82 55.05 41.23 12.18 24.73    2.48    10.28
+    ## 3:   1.03   2.49 0.41 1.98  65.82 55.05 41.23 12.18 24.73    2.48    10.28
+    ## 4:   1.03   2.49 0.41 1.98  65.82 55.05 41.23 12.18 24.73    2.48    10.28
+    ## 5:   1.03   2.49 0.41 1.98  65.82 55.05 41.23 12.18 24.73    2.48    10.28
+    ## 6:   1.03   2.49 0.41 1.98  65.82 55.05 41.23 12.18 24.73    2.48    10.28
+    ##    iacid oacid total_acids       lon      lat obesity_level smoke_gas_exposure
+    ## 1:  2.39  3.52         5.5 -116.7664 32.83505        normal               none
+    ## 2:  2.39  3.52         5.5 -116.7664 32.83505        normal               <NA>
+    ## 3:  2.39  3.52         5.5 -116.7664 32.83505        normal              smoke
+    ## 4:  2.39  3.52         5.5 -116.7664 32.83505        normal               <NA>
+    ## 5:  2.39  3.52         5.5 -116.7664 32.83505        normal               none
+    ## 6:  2.39  3.52         5.5 -116.7664 32.83505        normal              smoke
 
 ``` r
 tail(merged)
@@ -347,13 +363,27 @@ tail(merged)
     ## 4:           3     0    1        1 2077.703 2275.338 2706.081     22.46
     ## 5:           3     0    1        1 1929.866 2122.148 2558.054     22.46
     ## 6:           3     0    1        0 1945.743       NA       NA     22.46
-    ##          lon      lat obesity_level smoke_gas_exposure
-    ## 1: -117.6484 34.09751        normal               none
-    ## 2: -117.6484 34.09751        normal               none
-    ## 3: -117.6484 34.09751        normal                gas
-    ## 4: -117.6484 34.09751        normal                gas
-    ## 5: -117.6484 34.09751        normal                gas
-    ## 6: -117.6484 34.09751        normal               none
+    ##    pm25_so4 pm25_no3 pm25_nh4 pm25_oc pm25_ec pm25_om pm10_oc pm10_ec pm10_tc
+    ## 1:     2.65     7.75     2.96    6.49    1.19    7.79    8.32    1.22    9.54
+    ## 2:     2.65     7.75     2.96    6.49    1.19    7.79    8.32    1.22    9.54
+    ## 3:     2.65     7.75     2.96    6.49    1.19    7.79    8.32    1.22    9.54
+    ## 4:     2.65     7.75     2.96    6.49    1.19    7.79    8.32    1.22    9.54
+    ## 5:     2.65     7.75     2.96    6.49    1.19    7.79    8.32    1.22    9.54
+    ## 6:     2.65     7.75     2.96    6.49    1.19    7.79    8.32    1.22    9.54
+    ##    formic acetic  hcl hno3 o3_max o3106 o3_24   no2 pm10 no_24hr pm2_5_fr iacid
+    ## 1:   2.67   4.73 0.46 4.03  63.83  46.5  22.2 37.97 40.8   18.48    27.73  4.49
+    ## 2:   2.67   4.73 0.46 4.03  63.83  46.5  22.2 37.97 40.8   18.48    27.73  4.49
+    ## 3:   2.67   4.73 0.46 4.03  63.83  46.5  22.2 37.97 40.8   18.48    27.73  4.49
+    ## 4:   2.67   4.73 0.46 4.03  63.83  46.5  22.2 37.97 40.8   18.48    27.73  4.49
+    ## 5:   2.67   4.73 0.46 4.03  63.83  46.5  22.2 37.97 40.8   18.48    27.73  4.49
+    ## 6:   2.67   4.73 0.46 4.03  63.83  46.5  22.2 37.97 40.8   18.48    27.73  4.49
+    ##    oacid total_acids       lon      lat obesity_level smoke_gas_exposure
+    ## 1:   7.4       11.43 -117.6484 34.09751        normal               none
+    ## 2:   7.4       11.43 -117.6484 34.09751        normal               none
+    ## 3:   7.4       11.43 -117.6484 34.09751        normal                gas
+    ## 4:   7.4       11.43 -117.6484 34.09751        normal                gas
+    ## 5:   7.4       11.43 -117.6484 34.09751        normal                gas
+    ## 6:   7.4       11.43 -117.6484 34.09751        normal               none
 
 ### Check the variable types in the data
 
@@ -361,7 +391,7 @@ tail(merged)
 str(merged)
 ```
 
-    ## Classes 'data.table' and 'data.frame':   1200 obs. of  28 variables:
+    ## Classes 'data.table' and 'data.frame':   1200 obs. of  51 variables:
     ##  $ townname          : chr  "Alpine" "Alpine" "Alpine" "Alpine" ...
     ##  $ sid               : int  835 838 839 840 841 842 843 844 847 849 ...
     ##  $ male              : int  0 0 0 0 1 1 1 1 1 1 ...
@@ -386,6 +416,29 @@ str(merged)
     ##  $ fvc               : num  2826 1964 2327 2638 2595 ...
     ##  $ mmef              : num  3407 2133 2835 3466 2445 ...
     ##  $ pm25_mass         : num  8.74 8.74 8.74 8.74 8.74 8.74 8.74 8.74 8.74 8.74 ...
+    ##  $ pm25_so4          : num  1.73 1.73 1.73 1.73 1.73 1.73 1.73 1.73 1.73 1.73 ...
+    ##  $ pm25_no3          : num  1.59 1.59 1.59 1.59 1.59 1.59 1.59 1.59 1.59 1.59 ...
+    ##  $ pm25_nh4          : num  0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 ...
+    ##  $ pm25_oc           : num  2.54 2.54 2.54 2.54 2.54 2.54 2.54 2.54 2.54 2.54 ...
+    ##  $ pm25_ec           : num  0.48 0.48 0.48 0.48 0.48 0.48 0.48 0.48 0.48 0.48 ...
+    ##  $ pm25_om           : num  3.04 3.04 3.04 3.04 3.04 3.04 3.04 3.04 3.04 3.04 ...
+    ##  $ pm10_oc           : num  3.25 3.25 3.25 3.25 3.25 3.25 3.25 3.25 3.25 3.25 ...
+    ##  $ pm10_ec           : num  0.49 0.49 0.49 0.49 0.49 0.49 0.49 0.49 0.49 0.49 ...
+    ##  $ pm10_tc           : num  3.75 3.75 3.75 3.75 3.75 3.75 3.75 3.75 3.75 3.75 ...
+    ##  $ formic            : num  1.03 1.03 1.03 1.03 1.03 1.03 1.03 1.03 1.03 1.03 ...
+    ##  $ acetic            : num  2.49 2.49 2.49 2.49 2.49 2.49 2.49 2.49 2.49 2.49 ...
+    ##  $ hcl               : num  0.41 0.41 0.41 0.41 0.41 0.41 0.41 0.41 0.41 0.41 ...
+    ##  $ hno3              : num  1.98 1.98 1.98 1.98 1.98 1.98 1.98 1.98 1.98 1.98 ...
+    ##  $ o3_max            : num  65.8 65.8 65.8 65.8 65.8 ...
+    ##  $ o3106             : num  55 55 55 55 55 ...
+    ##  $ o3_24             : num  41.2 41.2 41.2 41.2 41.2 ...
+    ##  $ no2               : num  12.2 12.2 12.2 12.2 12.2 ...
+    ##  $ pm10              : num  24.7 24.7 24.7 24.7 24.7 ...
+    ##  $ no_24hr           : num  2.48 2.48 2.48 2.48 2.48 2.48 2.48 2.48 2.48 2.48 ...
+    ##  $ pm2_5_fr          : num  10.3 10.3 10.3 10.3 10.3 ...
+    ##  $ iacid             : num  2.39 2.39 2.39 2.39 2.39 2.39 2.39 2.39 2.39 2.39 ...
+    ##  $ oacid             : num  3.52 3.52 3.52 3.52 3.52 3.52 3.52 3.52 3.52 3.52 ...
+    ##  $ total_acids       : num  5.5 5.5 5.5 5.5 5.5 5.5 5.5 5.5 5.5 5.5 ...
     ##  $ lon               : num  -117 -117 -117 -117 -117 ...
     ##  $ lat               : num  32.8 32.8 32.8 32.8 32.8 ...
     ##  $ obesity_level     : chr  "normal" "normal" "normal" "normal" ...
@@ -411,12 +464,15 @@ table(merged$smoke_gas_exposure)
 
 ``` r
 #summary(merged$bmi)
-#summary(merged$fev)
-summary(merged$pm25_mass)
+summary(merged$fev)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##   5.960   7.615  10.545  14.362  20.988  29.970
+    ##   984.8  1827.6  2016.4  2030.1  2223.6  3323.7
+
+``` r
+#summary(merged$pm25_mass)
+```
 
 1.  Facet plot showing scatterplots with regression lines of BMI vs FEV
     by “townname”.
