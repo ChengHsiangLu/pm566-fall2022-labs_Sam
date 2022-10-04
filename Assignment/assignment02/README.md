@@ -1,7 +1,7 @@
 assignment02
 ================
 sl
-2022-10-03
+2022-10-04
 
 ``` r
 library(lubridate)
@@ -63,7 +63,7 @@ library(ggplot2)
 ```
 
 ``` r
-setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/assignments/assignment02/")
+setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/Assignment/assignment02/")
 ```
 
 ## Read in the data
@@ -71,23 +71,6 @@ setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/assignments/
 ``` r
 ind <- data.table::fread("chs_individual.csv")
 reg <- data.table::fread("chs_regional.csv")
-```
-
-``` r
-#ind[, sid := as.integer(sid)]
-
-## Dealing with NAs
-#reg[, townname   := fifelse(townname == "", NA_character_, townname)]
-
-## Selecting the three relevant columns, and keeping unique records
-#reg <- unique(reg[, list(townname, pm25_mass, lon, lat)])
-
-## Dropping NAs
-#reg <- reg[!is.na(townname)]
-
-## Removing duplicates
-#reg[, n := 1:.N, by = .(townname)]
-#reg <- reg[n == 1,][, n := NULL]
 ```
 
 ``` r
@@ -126,7 +109,10 @@ dim(merged)
 
     ## [1] 1200   49
 
-### ?In the case of missing values, impute data using the average within the variables “male” and “hispanic.”
+After merging the data, there are still 1200 rows. Therefore, there is
+no duplicates.
+
+### In the case of missing values, impute data using the average within the variables “male” and “hispanic.”
 
 ``` r
 summary(merged$bmi)
@@ -163,7 +149,8 @@ summary(merged$fev)
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
     ##   984.8  1827.6  2016.4  2030.1  2223.6  3323.7
 
-Turn NAs into means.
+I imputed the data using the average within the variables “male” and
+“hispanic.”
 
 ## Step2: Create a new categorical variable named “obesity_level” using the BMI measurement (underweight BMI\<14; normal BMI 14-22; overweight BMI 22-24; obese BMI\>24). To make sure the variable is rightly coded, create a summary table that contains the minimum BMI, maximum BMI, and the total number of observations per category.
 
@@ -186,6 +173,22 @@ table(merged$obesity_level)
     ##      normal       obese  overweight underweight 
     ##         975         103          87          35
 
+``` r
+merged_2 <- merged[!is.na(merged$obesity_level)][, .(
+  bmi_min = min(bmi, na.rm = T),
+  bmi_max = max(bmi, na.rm = T), 
+  bmi_length = length(bmi)
+), by="obesity_level"]
+
+merged_2
+```
+
+    ##    obesity_level  bmi_min  bmi_max bmi_length
+    ## 1:        normal 14.00380 21.96387        975
+    ## 2:    overweight 22.02353 23.99650         87
+    ## 3:         obese 24.00647 41.26613        103
+    ## 4:   underweight 11.29640 13.98601         35
+
 ## Step3: Create another categorical variable named “smoke_gas_exposure” that summarizes “Second Hand Smoke” and “Gas Stove.” The variable should have four categories in total.
 
 ``` r
@@ -207,81 +210,86 @@ nrow(merged[is.na(merged$smoke_gas_exposure)])
 
     ## [1] 60
 
+There are 60 NAs with the smoke_gas_exposure column.
+
 ## Step4: Create four summary tables showing the average (or proportion, if binary) and sd of “Forced expiratory volume in 1 second (ml)” and asthma indicator by town, sex, obesity level, and “smoke_gas_exposure.”
 
 ``` r
 merged[, .(
     fev_avg      = mean(fev, na.rm=TRUE),
-    asthma_avg      = mean(asthma, na.rm=TRUE)
+    fev_sd      = sd(fev, na.rm=TRUE),
+    asthma_avg      = mean(asthma, na.rm=TRUE),
+    asthma_sd      = sd(asthma, na.rm=TRUE)
     ),
     by = townname
     ][order(townname)]
 ```
 
-    ##          townname  fev_avg asthma_avg
-    ##  1:        Alpine 2087.101  0.1134021
-    ##  2:    Atascadero 2075.897  0.2551020
-    ##  3: Lake Elsinore 2038.849  0.1263158
-    ##  4:  Lake Gregory 2084.700  0.1515152
-    ##  5:     Lancaster 2003.044  0.1649485
-    ##  6:        Lompoc 2034.354  0.1134021
-    ##  7:    Long Beach 1985.861  0.1354167
-    ##  8:     Mira Loma 1985.202  0.1578947
-    ##  9:     Riverside 1989.881  0.1100000
-    ## 10:     San Dimas 2026.794  0.1717172
-    ## 11:   Santa Maria 2025.750  0.1340206
-    ## 12:        Upland 2024.266  0.1212121
+    ##          townname  fev_avg   fev_sd asthma_avg asthma_sd
+    ##  1:        Alpine 2087.101 291.1768  0.1134021 0.3187308
+    ##  2:    Atascadero 2075.897 324.0935  0.2551020 0.4381598
+    ##  3: Lake Elsinore 2038.849 303.6956  0.1263158 0.3339673
+    ##  4:  Lake Gregory 2084.700 319.9593  0.1515152 0.3603750
+    ##  5:     Lancaster 2003.044 317.1298  0.1649485 0.3730620
+    ##  6:        Lompoc 2034.354 351.0454  0.1134021 0.3187308
+    ##  7:    Long Beach 1985.861 319.4625  0.1354167 0.3439642
+    ##  8:     Mira Loma 1985.202 324.9634  0.1578947 0.3665767
+    ##  9:     Riverside 1989.881 277.5065  0.1100000 0.3144660
+    ## 10:     San Dimas 2026.794 318.7845  0.1717172 0.3790537
+    ## 11:   Santa Maria 2025.750 312.1725  0.1340206 0.3424442
+    ## 12:        Upland 2024.266 343.1637  0.1212121 0.3280346
 
 ``` r
 merged[, .(
     fev_avg      = mean(fev, na.rm=TRUE),
-    asthma_avg      = mean(asthma, na.rm=TRUE)
+    fev_sd      = sd(fev, na.rm=TRUE),
+    asthma_avg      = mean(asthma, na.rm=TRUE),
+    asthma_sd      = sd(asthma, na.rm=TRUE)
     ),
     by = male
     ][order(male)]
 ```
 
-    ##    male  fev_avg asthma_avg
-    ## 1:    0 1958.911  0.1208054
-    ## 2:    1 2103.787  0.1727749
+    ##    male  fev_avg   fev_sd asthma_avg asthma_sd
+    ## 1:    0 1958.911 311.9181  0.1208054 0.3261747
+    ## 2:    1 2103.787 307.5123  0.1727749 0.3783828
 
 ``` r
 merged[, .(
     fev_avg      = mean(fev, na.rm=TRUE),
-    asthma_avg      = mean(asthma, na.rm=TRUE)
+    fev_sd      = sd(fev, na.rm=TRUE),
+    asthma_avg      = mean(asthma, na.rm=TRUE),
+    asthma_sd      = sd(asthma, na.rm=TRUE)
     ),
     by = obesity_level
     ][order(obesity_level)]
 ```
 
-    ##    obesity_level  fev_avg asthma_avg
-    ## 1:        normal 1999.794 0.14014752
-    ## 2:         obese 2266.154 0.21000000
-    ## 3:    overweight 2224.322 0.16470588
-    ## 4:   underweight 1698.327 0.08571429
+    ##    obesity_level  fev_avg   fev_sd asthma_avg asthma_sd
+    ## 1:        normal 1999.794 295.1964 0.14014752 0.3473231
+    ## 2:         obese 2266.154 325.4710 0.21000000 0.4093602
+    ## 3:    overweight 2224.322 317.4261 0.16470588 0.3731162
+    ## 4:   underweight 1698.327 303.3983 0.08571429 0.2840286
 
 ``` r
 merged[, .(
     fev_avg      = mean(fev, na.rm=TRUE),
-    asthma_avg      = mean(asthma, na.rm=TRUE)
+    fev_sd      = sd(fev, na.rm=TRUE),
+    asthma_avg      = mean(asthma, na.rm=TRUE),
+    asthma_sd      = sd(asthma, na.rm=TRUE)
     ),
     by = smoke_gas_exposure
     ][order(smoke_gas_exposure)]
 ```
 
-    ##    smoke_gas_exposure  fev_avg asthma_avg
-    ## 1:                gas 2025.989  0.1477428
-    ## 2:               none 2055.356  0.1476190
-    ## 3:              smoke 2055.714  0.1714286
-    ## 4:          smoke_gas 2019.867  0.1301370
-    ## 5:               <NA> 2001.878  0.1489362
+    ##    smoke_gas_exposure  fev_avg   fev_sd asthma_avg asthma_sd
+    ## 1:                gas 2025.989 317.6305  0.1477428 0.3550878
+    ## 2:               none 2055.356 330.4169  0.1476190 0.3555696
+    ## 3:              smoke 2055.714 295.6475  0.1714286 0.3823853
+    ## 4:          smoke_gas 2019.867 298.9728  0.1301370 0.3376123
+    ## 5:               <NA> 2001.878 340.2592  0.1489362 0.3598746
 
 ## Looking at the Data (EDA)
-
-The primary questions of interest are: 1. What is the association
-between BMI and FEV (forced expiratory volume)? 2. What is the
-association between smoke and gas exposure and FEV? 3. What is the
-association between PM2.5 exposure and FEV?
 
 ### Check the dimensions and headers and footers of the data
 
@@ -479,101 +487,156 @@ summary(merged$fev)
 
 ``` r
 ggplot(merged, aes(x=bmi, y=fev, color=townname)) + 
-  geom_point(size=0.1) +
-  geom_smooth(size=0.5, method=lm, se=FALSE, fullrange=TRUE) +
+  geom_point(size=0.2) +
+  geom_smooth(size=0.2, method=lm, se=FALSE, fullrange=TRUE, color = "black") +
   facet_wrap(~townname)
 ```
 
     ## `geom_smooth()` using formula 'y ~ x'
 
-![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/scatterplots-1.png)<!-- -->
 
 2.  Stacked histograms of FEV by BMI category and FEV by smoke/gas
     exposure. Use different color schemes than the ggplot default.
 
 ``` r
-ggplot(data = merged, aes(fev, color=obesity_level, fill = obesity_level)) + 
-  geom_histogram( alpha=0.5) +
+ggplot(data = merged[!is.na(obesity_level)], aes(fev, color=obesity_level, fill = obesity_level)) + 
+  geom_histogram(fill="white", alpha=0.5) +
   scale_color_brewer(palette="Dark2") +
   scale_fill_brewer(palette="Dark2") +
-  facet_wrap(~ obesity_level, nrow = 1)
+  facet_wrap(~ obesity_level, nrow = 2)
 ```
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/his_fev_BMI-1.png)<!-- -->
 
 ``` r
-ggplot(data = merged, aes(fev, color=smoke_gas_exposure, fill = smoke_gas_exposure)) + 
+ggplot(data = merged[!is.na(smoke_gas_exposure)], aes(fev, color=smoke_gas_exposure, fill = smoke_gas_exposure)) + 
   geom_histogram(fill="white", alpha=0.5, position="identity") +
-  scale_color_brewer(palette="Paired") + 
-  theme_classic() +
+  scale_color_brewer(palette="Dark2") +
+  scale_fill_brewer(palette="Dark2") +
   theme(legend.position="top") +
-  facet_wrap(~ smoke_gas_exposure, nrow = 1)
+  facet_wrap(~ smoke_gas_exposure, nrow = 2)
 ```
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](README_files/figure-gfm/his_FEV_smoke_gas-1.png)<!-- -->
 
 3.  Barchart of BMI by smoke/gas exposure.
 
 ``` r
-ggplot(merged, aes(x=smoke_gas_exposure, y=bmi)) + 
-  geom_bar(stat="identity", fill = "#00abff")
+ggplot(data = merged[!is.na(obesity_level)][!is.na(smoke_gas_exposure)]) + 
+  geom_bar(mapping = aes(x = smoke_gas_exposure, fill = obesity_level), show.legend = T, width = 1,
+           alpha=0.8, position="identity") + 
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/bar_bmi_smoke_gas-1.png)<!-- -->
 
 4.  Statistical summary graphs of FEV by BMI and FEV by smoke/gas
     exposure category.
 
 ``` r
-ggplot(merged, aes(x=fev, y=bmi, color=townname)) +
-  geom_violin(trim=FALSE) +
-  facet_wrap(~ townname, nrow = 1)
-```
-
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
-
-``` r
-ggplot(merged, aes(x=smoke_gas_exposure, y=fev, color=smoke_gas_exposure)) +
+ggplot(merged[!is.na(merged$obesity_level)], aes(x=obesity_level, y=fev, color=obesity_level)) +
   geom_boxplot()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](README_files/figure-gfm/box_fev_bmi-1.png)<!-- -->
+
+``` r
+ggplot(merged[!is.na(merged$smoke_gas_exposure)], aes(x=smoke_gas_exposure, y=fev, color=smoke_gas_exposure)) +
+  geom_boxplot()
+```
+
+![](README_files/figure-gfm/box_fev_smoke_gas-1.png)<!-- -->
 
 5.  A leaflet map showing the concentrations of PM2.5 mass in each of
     the CHS communities.
 
 ``` r
-merged_avg <- merged[, .(
-  pm25_mass = mean(pm25_mass, na.rm = T),
-  lat = lat, 
-  lon = lon
-), by="townname"]
+pal <- colorNumeric(c('darkgreen','goldenrod','darkred'), domain=reg$pm25_mass)
+pal
 ```
+
+    ## function (x) 
+    ## {
+    ##     if (length(x) == 0 || all(is.na(x))) {
+    ##         return(pf(x))
+    ##     }
+    ##     if (is.null(rng)) 
+    ##         rng <- range(x, na.rm = TRUE)
+    ##     rescaled <- scales::rescale(x, from = rng)
+    ##     if (any(rescaled < 0 | rescaled > 1, na.rm = TRUE)) 
+    ##         warning("Some values were outside the color scale and will be treated as NA")
+    ##     if (reverse) {
+    ##         rescaled <- 1 - rescaled
+    ##     }
+    ##     pf(rescaled)
+    ## }
+    ## <bytecode: 0x7fc30cd87bc8>
+    ## <environment: 0x7fc30cd8a4f8>
+    ## attr(,"colorType")
+    ## [1] "numeric"
+    ## attr(,"colorArgs")
+    ## attr(,"colorArgs")$na.color
+    ## [1] "#808080"
 
 ``` r
+#label, color
 leaflet() %>%
   addProviderTiles('OpenStreetMap') %>% 
-  addCircles(data = unique(merged_avg),
-             lat=~lat,lng=~lon, 
-             color = "blue",
-             opacity = 0.5, fillOpacity = 1, radius = 500)
+  addCircles(data = reg,
+             lat=~lat,lng=~lon,
+             label = ~paste0(round(pm25_mass,2)), color = ~ pal(pm25_mass),
+             opacity = 1, fillOpacity = 1, radius = 500) %>%
+  # And a pretty legend
+  addLegend('bottomleft', pal=pal, values=reg$pm25_mass,
+             title='pm25_mass', opacity=1)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 6.  Choose a visualization to examine whether PM2.5 mass is associated
     with FEV.
 
 ``` r
-ggplot(merged, aes(x = pm25_mass, y=fev)) + 
-  geom_point(size=0.1) +
-  geom_smooth(size=0.5, method=lm, se=FALSE, fullrange=TRUE)
+ggplot(merged, aes(x = pm25_mass, y=fev, color = pm25_mass)) + 
+  geom_point(size=0.1, position="jitter") +
+  geom_smooth(size=0.2, method=lm, se=FALSE, fullrange=TRUE, color = "red")
 ```
 
     ## `geom_smooth()` using formula 'y ~ x'
 
-![](README_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](README_files/figure-gfm/scatter_pm25_fev-1.png)<!-- -->
+
+``` r
+ggplot(merged[!is.na(merged$obesity_level)], aes(x = pm25_mass, y=fev, color = pm25_mass)) + 
+  geom_point(size=0.1, position="jitter") +
+  geom_smooth(size=0.2, method=lm, se=FALSE, fullrange=TRUE, color = "red") +
+  facet_wrap(~ obesity_level, nrow = 2)
+```
+
+    ## `geom_smooth()` using formula 'y ~ x'
+
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+## Questions
+
+### 1. What is the association between BMI and FEV (forced expiratory volume)?
+
+In the scatterplots, there is a positive correlation between BMI and FEV
+in differnt towns. People with higher BMI tend to have higher fev.
+
+### 2. What is the association between smoke and gas exposure and FEV?
+
+In the boxplot of smoke_gas_exposure and FEV, we can see that people in
+smoke_gas category have a lower median than other categories.
+
+### 3. What is the association between PM2.5 exposure and FEV?
+
+In the scatterplot of PM2.5 and FEV, we cannot see any correlation
+between them. Even if we check with different categories of
+obseity_level, there isn’t any correlation between them.
