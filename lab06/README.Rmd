@@ -39,7 +39,7 @@ mts <- as_tibble(mts)
 mts
 ```
 
-## Question 1: What specialties do we have?
+## Question 1: What specialties do we have? 
 We can use count() from dplyr to figure out how many records are there per specialty?
 
 ```{r medical-specialties}
