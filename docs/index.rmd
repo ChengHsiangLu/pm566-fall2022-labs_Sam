@@ -7,24 +7,132 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(rvest)
+library(httr)
+library(tidyverse)
+library(stringr)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/lab07/")
 ```
 
-## Including Plots
+## Q1: Howmany papers are on Sars-cov-2?
 
-You can also embed plots, for example:
+```{r read-data, cashe=TRUE}
+# Downloading the website
+website <- xml2::read_html("https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2")
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+# Finding the counts
+counts <- xml2::xml_find_first(website, "/html/body/main/div[9]/div[2]/div[2]/div[1]/div[1]")
+
+# Turning it into text
+counts <- as.character(counts)
+
+# Extracting the data using regex
+stringr::str_extract(counts, "[0-9,]+")
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Question 2: Academic publications on COVID19 and Hawaii
+You need to query the following The parameters passed to the query are documented here.
+
+Use the function httr::GET() to make the following query:
+
+Baseline URL: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi
+
+Query parameters:
+
+db: pubmed
+term: covid19 hawaii
+retmax: 1000
+
+```{r}
+library(httr)
+query_ids <- GET(
+  url   = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
+  query = list(
+    db      = "pubmed",
+    term    = "covid19 hawaii",
+    retmax  = 1000)
+)
+
+# Extracting the content of the response of GET
+ids <- httr::content(query_ids)
+```
+
+## Question 3: Get details about the articles
+The Ids are wrapped around text in the following way: <Id>... id number ...</Id>. we can use a regular expression that extract that information. Fill out the following lines of code:
+
+```{r}
+# Turn the result into a character vector
+ids <- as.character(ids)
+
+# Find all the ids 
+ids <- stringr::str_extract_all(ids, "<Id>[[:digit:]]+</Id>")[[1]]
+
+# Remove all the leading and trailing <Id> </Id>. Make use of "|"
+ids <- stringr::str_remove_all(ids, "</?Id>")
+
+head(ids)
+```
+
+Grab publications with these Pubmed IDs.
+
+```{r}
+publications <- GET(
+  url   = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
+  query = list(
+    db  = "pubmed",
+    id  = paste(ids,collapse = ","),
+  retmax = 1000,
+  rettype = "abstract"
+    )
+)
+# Extracting the content of the response of GET
+publications <- httr::content(publications)
+```
+
+## Question 4.  More practice with regex
+
+## Question 5. Form a database
+
+We want to build a dataset which includes the title and the abstract of the paper. The title of all records is enclosed by the HTML tag ArticleTitle, and the abstract by Abstract.
+
+Before applying the functions to extract text directly, it will help to process the XML a bit. We will use the xml2::xml_children() function to keep one element per id. This way, if a paper is missing the abstract, or something else, we will be able to properly match PUBMED IDS with their corresponding records.
+
+```{r}
+pub_char_list <- xml2::xml_children(publications)
+pub_char_list <- sapply(pub_char_list, as.character)
+```
+
+Now, extract the abstract and article title for each one of the elements of pub_char_list. You can either use sapply() as we just did, or simply take advantage of vectorization of stringr::str_extract
+
+```{r}
+abstracts <- str_extract(pub_char_list, "<Abstract>[[:print:][:space:]]+</Abstract>")
+abstracts[[1]]
+abstracts <- str_remove_all(abstracts, "</?[[:alnum:]- =\"]+>") 
+abstracts[[1]]
+abstracts <- str_replace_all(abstracts, "[[:space:]]+"," ")
+abstracts[[1]]
+```
+
+Now get the titles:
+
+```{r}
+titles <- str_extract(pub_char_list, "<ArticleTitle>[[:print:][:space:]]+</ArticleTitle>")
+titles[[1]]
+titles <- str_remove_all(titles, "</?[[:alnum:]- =\"]+>")
+titles[[1]]
+```
+
+Finally the dataset:
+
+```{r}
+database <- data.frame(
+  PubMedId = ids,
+  Title    = titles,
+  Abstract = abstracts
+)
+knitr::kable(database[1:8,], caption = "Some papers about Covid19 and Hawaii")
+```
