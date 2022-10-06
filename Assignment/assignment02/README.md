@@ -1,7 +1,7 @@
 assignment02
 ================
 sl
-2022-10-04
+2022-10-06
 
 ``` r
 library(lubridate)
@@ -69,8 +69,23 @@ setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/Assignment/a
 ## Read in the data
 
 ``` r
-ind <- data.table::fread("chs_individual.csv")
-reg <- data.table::fread("chs_regional.csv")
+if (!file.exists("chs_individual.csv"))
+  download.file(
+    url = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/01_chs/chs_individual.csv",
+    destfile = "chs_individual.csv",
+    method   = "libcurl",
+    timeout  = 60
+    )
+ind <- fread("chs_individual.csv")
+
+if (!file.exists("chs_regional.csv"))
+  download.file(
+    url = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/01_chs/chs_regional.csv",
+    destfile = "chs_regional.csv",
+    method   = "libcurl",
+    timeout  = 60
+    )
+reg <- fread("chs_regional.csv")
 ```
 
 ``` r
@@ -128,11 +143,27 @@ summary(merged$fev)
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
     ##   984.8  1809.0  2022.7  2031.3  2249.7  3323.7      95
 
+There are 89 NAs in the column of bmi and 95 NAs in the column of fev.
+
 ``` r
-merged[, bmi := fcoalesce(bmi, mean(bmi, na.rm = TRUE)),
-    by = .(male, hispanic)]
-merged[, fev := fcoalesce(fev, mean(fev, na.rm = TRUE)),
-    by = .(male, hispanic)]
+mean(is.na(merged$bmi))
+```
+
+    ## [1] 0.07416667
+
+``` r
+mean(is.na(merged$fev))
+```
+
+    ## [1] 0.07916667
+
+However,only 7.4% and 7.9% of the data is missing.
+
+``` r
+merged[, bmi := fcoalesce(bmi, mean(bmi, na.rm = TRUE)), 
+       by = .(male, hispanic)]
+merged[, fev := fcoalesce(fev, mean(fev, na.rm = TRUE)), 
+       by = .(male, hispanic)]
 ```
 
 ``` r
@@ -174,13 +205,11 @@ table(merged$obesity_level)
     ##         975         103          87          35
 
 ``` r
-merged_2 <- merged[!is.na(merged$obesity_level)][, .(
+merged[!is.na(merged$obesity_level)][, .(
   bmi_min = min(bmi, na.rm = T),
   bmi_max = max(bmi, na.rm = T), 
   bmi_length = length(bmi)
 ), by="obesity_level"]
-
-merged_2
 ```
 
     ##    obesity_level  bmi_min  bmi_max bmi_length
@@ -500,6 +529,12 @@ ggplot(merged, aes(x=bmi, y=fev, color=townname)) +
     exposure. Use different color schemes than the ggplot default.
 
 ``` r
+merged$smoke_gas_exposure <- factor(merged$smoke_gas_exposure, levels=c("none", "smoke", "gas", "smoke_gas"))
+
+merged$obesity_level <- factor(merged$obesity_level, levels=c("underweight", "normal", "overweight", "obese"))
+```
+
+``` r
 ggplot(data = merged[!is.na(obesity_level)], aes(fev, color=obesity_level, fill = obesity_level)) + 
   geom_histogram(fill="white", alpha=0.5) +
   scale_color_brewer(palette="Dark2") +
@@ -540,11 +575,25 @@ ggplot(data = merged[!is.na(obesity_level)][!is.na(smoke_gas_exposure)]) +
     exposure category.
 
 ``` r
+merged[!is.na(merged$obesity_level)] %>%
+  ggplot() + 
+    stat_summary(mapping = aes(x = obesity_level, y = fev),
+    fun.min = min,
+    fun.max = max,
+    fun = median)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+``` r
 ggplot(merged[!is.na(merged$obesity_level)], aes(x=obesity_level, y=fev, color=obesity_level)) +
   geom_boxplot()
 ```
 
 ![](README_files/figure-gfm/box_fev_bmi-1.png)<!-- -->
+
+By checking the median of fev, the category of underweight is slightly
+lower than other groups.
 
 ``` r
 ggplot(merged[!is.na(merged$smoke_gas_exposure)], aes(x=smoke_gas_exposure, y=fev, color=smoke_gas_exposure)) +
@@ -576,8 +625,8 @@ pal
     ##     }
     ##     pf(rescaled)
     ## }
-    ## <bytecode: 0x7fc30cd87bc8>
-    ## <environment: 0x7fc30cd8a4f8>
+    ## <bytecode: 0x7f9a7faed430>
+    ## <environment: 0x7f9a7faefcf0>
     ## attr(,"colorType")
     ## [1] "numeric"
     ## attr(,"colorArgs")
@@ -597,7 +646,7 @@ leaflet() %>%
              title='pm25_mass', opacity=1)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 6.  Choose a visualization to examine whether PM2.5 mass is associated
     with FEV.
@@ -621,7 +670,7 @@ ggplot(merged[!is.na(merged$obesity_level)], aes(x = pm25_mass, y=fev, color = p
 
     ## `geom_smooth()` using formula 'y ~ x'
 
-![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ## Questions
 
@@ -633,7 +682,7 @@ in differnt towns. People with higher BMI tend to have higher fev.
 ### 2. What is the association between smoke and gas exposure and FEV?
 
 In the boxplot of smoke_gas_exposure and FEV, we can see that people in
-smoke_gas category have a lower median than other categories.
+smoke_gas category have a slightly lower median than other categories.
 
 ### 3. What is the association between PM2.5 exposure and FEV?
 
