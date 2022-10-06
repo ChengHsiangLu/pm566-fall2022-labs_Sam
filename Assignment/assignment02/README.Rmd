@@ -26,8 +26,25 @@ setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/Assignment/a
 
 ## Read in the data
 ```{r read-data, cashe=TRUE}
-ind <- data.table::fread("chs_individual.csv")
-reg <- data.table::fread("chs_regional.csv")
+if (!file.exists("chs_individual.csv"))
+  download.file(
+    url = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/01_chs/chs_individual.csv",
+    destfile = "chs_individual.csv",
+    method   = "libcurl",
+    timeout  = 60
+    )
+ind <- fread("chs_individual.csv")
+```
+
+```{r read-data, cashe=TRUE}
+if (!file.exists("chs_regional.csv"))
+  download.file(
+    url = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/01_chs/chs_regional.csv",
+    destfile = "chs_regional.csv",
+    method   = "libcurl",
+    timeout  = 60
+    )
+reg <- fread("chs_regional.csv")
 ```
 
 ```{r}
@@ -63,11 +80,22 @@ summary(merged$bmi)
 summary(merged$fev)
 ```
 
+There are 89 NAs in the column of bmi and 95 NAs in the column of fev.
+
 ```{r}
-merged[, bmi := fcoalesce(bmi, mean(bmi, na.rm = TRUE)),
-    by = .(male, hispanic)]
-merged[, fev := fcoalesce(fev, mean(fev, na.rm = TRUE)),
-    by = .(male, hispanic)]
+mean(is.na(merged$bmi))
+```
+```{r}
+mean(is.na(merged$fev))
+```
+
+However,only 7.4% and 7.9% of the data is missing.
+
+```{r}
+merged[, bmi := fcoalesce(bmi, mean(bmi, na.rm = TRUE)), 
+       by = .(male, hispanic)]
+merged[, fev := fcoalesce(fev, mean(fev, na.rm = TRUE)), 
+       by = .(male, hispanic)]
 ```
 
 ```{r}
@@ -92,13 +120,11 @@ table(merged$obesity_level)
 ```
 
 ```{r}
-merged_2 <- merged[!is.na(merged$obesity_level)][, .(
+merged[!is.na(merged$obesity_level)][, .(
   bmi_min = min(bmi, na.rm = T),
   bmi_max = max(bmi, na.rm = T), 
   bmi_length = length(bmi)
 ), by="obesity_level"]
-
-merged_2
 ```
 
 ## Step3: Create another categorical variable named “smoke_gas_exposure” that summarizes “Second Hand Smoke” and “Gas Stove.” The variable should have four categories in total.
@@ -165,7 +191,6 @@ merged[, .(
 ```
 
 ## Looking at the Data (EDA)
-
 ### Check the dimensions and headers and footers of the data
 ```{r}
 dim(merged)
@@ -204,6 +229,12 @@ ggplot(merged, aes(x=bmi, y=fev, color=townname)) +
 ```
 
 2. Stacked histograms of FEV by BMI category and FEV by smoke/gas exposure. Use different color schemes than the ggplot default.
+```{r}
+merged$smoke_gas_exposure <- factor(merged$smoke_gas_exposure, levels=c("none", "smoke", "gas", "smoke_gas"))
+
+merged$obesity_level <- factor(merged$obesity_level, levels=c("underweight", "normal", "overweight", "obese"))
+```
+
 ```{r his_fev_BMI}
 ggplot(data = merged[!is.na(obesity_level)], aes(fev, color=obesity_level, fill = obesity_level)) + 
   geom_histogram(fill="white", alpha=0.5) +
@@ -222,6 +253,7 @@ ggplot(data = merged[!is.na(smoke_gas_exposure)], aes(fev, color=smoke_gas_expos
 ```
 
 3. Barchart of BMI by smoke/gas exposure.
+
 ```{r bar_bmi_smoke_gas}
 ggplot(data = merged[!is.na(obesity_level)][!is.na(smoke_gas_exposure)]) + 
   geom_bar(mapping = aes(x = smoke_gas_exposure, fill = obesity_level), show.legend = T, width = 1,
@@ -231,10 +263,22 @@ ggplot(data = merged[!is.na(obesity_level)][!is.na(smoke_gas_exposure)]) +
 ```
 
 4. Statistical summary graphs of FEV by BMI and FEV by smoke/gas exposure category.
+
+```{r}
+merged[!is.na(merged$obesity_level)] %>%
+  ggplot() + 
+    stat_summary(mapping = aes(x = obesity_level, y = fev),
+    fun.min = min,
+    fun.max = max,
+    fun = median)
+```
+
 ```{r box_fev_bmi}
 ggplot(merged[!is.na(merged$obesity_level)], aes(x=obesity_level, y=fev, color=obesity_level)) +
   geom_boxplot()
 ```
+
+By checking the median of fev, the category of underweight is slightly lower than other groups.
 
 ```{r box_fev_smoke_gas}
 ggplot(merged[!is.na(merged$smoke_gas_exposure)], aes(x=smoke_gas_exposure, y=fev, color=smoke_gas_exposure)) +
@@ -282,7 +326,7 @@ In the scatterplots, there is a positive correlation between BMI and FEV in diff
 
 ### 2. What is the association between smoke and gas exposure and FEV? 
 
-In the boxplot of smoke_gas_exposure and FEV, we can see that people in smoke_gas category have a lower median than other categories.
+In the boxplot of smoke_gas_exposure and FEV, we can see that people in smoke_gas category have a slightly lower median than other categories.
 
 ### 3. What is the association between PM2.5 exposure and FEV?
 
