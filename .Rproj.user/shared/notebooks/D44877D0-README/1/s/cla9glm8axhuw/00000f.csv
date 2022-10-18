@@ -1,0 +1,2 @@
+"0","ggplot(merged[!is.na(merged$obesity_level)], aes(x=obesity_level, y=fev, color=obesity_level)) +"
+"0","  geom_boxplot()"

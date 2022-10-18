@@ -1,0 +1,2 @@
+"0","merged[, diabetes_percentage := fcoalesce(diabetes_percentage, mean(diabetes_percentage, na.rm = TRUE))]"
+"0","merged[, obesity_percentage := fcoalesce(obesity_percentage, mean(obesity_percentage, na.rm = TRUE))]"

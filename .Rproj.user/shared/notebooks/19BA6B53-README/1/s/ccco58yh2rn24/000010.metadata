@@ -1,0 +1,1 @@
+{"height":347.34239802224968,"width":562.0,"size_behavior":0,"conditions":[[0,"`geom_smooth()` using formula 'y ~ x'\n"],[1,"Warning: Removed 1 rows containing non-finite values (stat_smooth)."],[1,"Warning: Removed 1 rows containing missing values (geom_point)."]]}

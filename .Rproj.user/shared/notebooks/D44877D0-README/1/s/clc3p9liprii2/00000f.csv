@@ -1,0 +1,8 @@
+"0","if (!file.exists(""chs_regional.csv""))"
+"0","  download.file("
+"0","    url = ""https://raw.githubusercontent.com/USCbiostats/data-science-data/master/01_chs/chs_regional.csv"","
+"0","    destfile = ""chs_regional.csv"","
+"0","    method   = ""libcurl"","
+"0","    timeout  = 60"
+"0","    )"
+"0","reg <- fread(""chs_regional.csv"")"

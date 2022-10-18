@@ -1,0 +1,6 @@
+"0","ggplot(merged[!is.na(region)], aes(x =obesity_percentage, y=diabetes_percentage, color = region)) + "
+"0","  geom_point(size=0.1, position=""jitter"") +"
+"0","  geom_smooth(size=0.2, method=lm, se=FALSE, fullrange=TRUE, color = ""black"") +"
+"0","  scale_color_brewer(palette=""Set2"") +"
+"0","  scale_fill_brewer() +"
+"0","  facet_wrap(~region, nrow = 2)"

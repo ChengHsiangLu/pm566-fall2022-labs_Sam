@@ -1,0 +1,1 @@
+"0","met_avg[, elev_cat := fifelse(elev > 252, ""high"", ""low"")]"

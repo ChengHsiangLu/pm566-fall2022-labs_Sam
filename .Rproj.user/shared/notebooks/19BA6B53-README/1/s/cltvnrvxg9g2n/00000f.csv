@@ -1,0 +1,4 @@
+"0","met_avg[!is.na(region) & !is.na(wind.sp)] %>% "
+"0","  ggplot() + "
+"0","  geom_violin(mapping = aes(y = wind.sp, x = 1, color=region, fill = region)) +"
+"0","  facet_wrap(~ region, nrow = 1)"

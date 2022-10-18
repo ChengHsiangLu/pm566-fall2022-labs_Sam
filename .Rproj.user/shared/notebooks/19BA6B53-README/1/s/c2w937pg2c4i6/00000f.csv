@@ -1,0 +1,4 @@
+"0","met_avg[!is.na(region)] %>% "
+"0","  ggplot() + "
+"0","  geom_violin(mapping = aes(x = 1, y = dew.point, color=region, fill = region)) + "
+"0","  facet_wrap(~ region, nrow = 1)"

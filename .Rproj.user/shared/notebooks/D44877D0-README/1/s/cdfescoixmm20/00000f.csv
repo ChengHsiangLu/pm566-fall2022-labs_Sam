@@ -1,0 +1,4 @@
+"0","ggplot(merged, aes(x=bmi, y=fev, color=townname)) + "
+"0","  geom_point(size=0.2) +"
+"0","  geom_smooth(size=0.2, method=lm, se=FALSE, fullrange=TRUE, color = ""black"") +"
+"0","  facet_wrap(~townname)"

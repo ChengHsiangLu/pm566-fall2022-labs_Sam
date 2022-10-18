@@ -1,0 +1,5 @@
+"0","spec %>%"
+"0","  top_n(10) %>%"
+"0","  ggplot(aes(x = n, y = fct_reorder(medical_specialty, n ))) +"
+"0","    geom_col()"
+"2","Selecting by n"

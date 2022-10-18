@@ -1,0 +1,6 @@
+"0","merged[!is.na(merged$obesity_level)] %>%"
+"0","  ggplot() + "
+"0","    stat_summary(mapping = aes(x = obesity_level, y = fev),"
+"0","    fun.min = min,"
+"0","    fun.max = max,"
+"0","    fun = median)"

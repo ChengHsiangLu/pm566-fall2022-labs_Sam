@@ -1,0 +1,6 @@
+"0","ggplot(data = merged[!is.na(smoke_gas_exposure)], aes(fev, color=smoke_gas_exposure, fill = smoke_gas_exposure)) + "
+"0","  geom_histogram(fill=""white"", alpha=0.5, position=""identity"") +"
+"0","  scale_color_brewer(palette=""Dark2"") +"
+"0","  scale_fill_brewer(palette=""Dark2"") +"
+"0","  theme(legend.position=""top"") +"
+"0","  facet_wrap(~ smoke_gas_exposure, nrow = 2)"

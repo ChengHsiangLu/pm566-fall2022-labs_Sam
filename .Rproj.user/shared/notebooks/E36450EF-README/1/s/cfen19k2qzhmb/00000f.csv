@@ -1,0 +1,8 @@
+"0","merged[, n := 1:.N, by = .(state, statedesc, cityname, lat, lon)]"
+"0","merged <- merged[n == 1,][, n := NULL]"
+"0",""
+"0","length(unique(merged$lat))"
+"1","[1]"
+"1"," 28505"
+"1","
+"

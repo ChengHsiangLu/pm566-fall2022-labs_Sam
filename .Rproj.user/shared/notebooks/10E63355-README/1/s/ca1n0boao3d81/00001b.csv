@@ -1,0 +1,4 @@
+"0","station_avg[ , temp_dist_state50 := temp - temp50 ]"
+"0","station_avg[ , windsp_dist_state50 := wind.sp - windsp50]"
+"0",""
+"0","station_avg"

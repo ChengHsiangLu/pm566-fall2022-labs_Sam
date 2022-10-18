@@ -1,0 +1,2 @@
+"0","mergered <- rbind(age_15_49, age_70) "
+"0","#pm <- mutate(mergered, age = factor(rep(c(""15-49"", "">70""), c(nrow(age_15_49), nrow(age_70)))))"

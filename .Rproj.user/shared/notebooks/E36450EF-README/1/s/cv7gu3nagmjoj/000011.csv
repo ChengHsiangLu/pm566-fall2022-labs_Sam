@@ -1,0 +1,6 @@
+"0","merged[!is.na(obesity_percentage)][!is.na(region)] %>%"
+"0","  ggplot() + "
+"0","    stat_summary(mapping = aes(x = region, y = obesity_percentage),"
+"0","    fun.min = min,"
+"0","    fun.max = max,"
+"0","    fun = median)"

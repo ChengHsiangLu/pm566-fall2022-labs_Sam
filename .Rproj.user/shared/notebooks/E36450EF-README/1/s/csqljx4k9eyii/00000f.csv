@@ -1,0 +1,1 @@
+"0","pal_dia <- colorNumeric(c('darkblue','goldenrod','darkred'), domain=merged$diabetes_percentage)"

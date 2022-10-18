@@ -1,0 +1,3 @@
+"0","ggplot(merged, aes(x =obesity_percentage, y=diabetes_percentage, color = state)) + "
+"0","  geom_point(size=0.1, position=""jitter"") +"
+"0","  geom_smooth(size=0.2, method=lm, se=FALSE, fullrange=TRUE, color = ""black"")"

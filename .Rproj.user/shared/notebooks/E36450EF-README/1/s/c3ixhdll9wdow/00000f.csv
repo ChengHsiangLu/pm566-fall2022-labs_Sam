@@ -1,0 +1,8 @@
+"0","obe <- read.socrata("
+"0","  ""https://chronicdata.cdc.gov/resource/bjvu-3y7d.json?year=2017"","
+"0","  app_token = ""bEkVW73ASzmTkZ9riAtf2YS5c"","
+"0","  email     = ""clu74108@usc.edu"","
+"0","  password  = ""Samuelsunny0325!"""
+"0",")"
+"0","obe <- as.data.table(obe)"
+"0","write.csv(obe,""obe.csv"", row.names = F)"

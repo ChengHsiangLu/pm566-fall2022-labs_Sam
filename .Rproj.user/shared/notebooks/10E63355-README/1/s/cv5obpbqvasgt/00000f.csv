@@ -1,0 +1,6 @@
+"0","station_avg <-"
+"0","  met[ , .("
+"0","    temp = mean(temp, na.rm = T),"
+"0","    wind.sp = mean(wind.sp, na.rm = T),"
+"0","    atm.press = mean(atm.press, na.rm = T)"
+"0","  ), by = ""USAFID""]"

@@ -1,0 +1,5 @@
+"0","met_avg[!is.na(region) & !is.na(wind.sp)] %>% "
+"0","  ggplot(mapping = aes(x = wind.sp, y = dew.point)) + "
+"0","  geom_point(mapping = aes(color = region)) + "
+"0","  geom_smooth(method =lm, mapping = aes(linetype = region)) +"
+"0","  facet_wrap(~ region, nrow = 2)"

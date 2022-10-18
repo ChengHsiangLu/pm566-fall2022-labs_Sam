@@ -1,0 +1,6 @@
+"0","statemeds <- station_avg[ , .("
+"0","    temp50 = median(temp, na.rm = T),"
+"0","    windsp50 = median(wind.sp, na.rm = T)"
+"0","), by = STATE][order(STATE)]"
+"0",""
+"0","statemeds"

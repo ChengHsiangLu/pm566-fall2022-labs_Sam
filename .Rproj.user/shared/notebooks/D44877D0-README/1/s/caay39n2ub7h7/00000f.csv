@@ -1,0 +1,4 @@
+"0","ggplot(merged[!is.na(merged$obesity_level)], aes(x = pm25_mass, y=fev, color = pm25_mass)) + "
+"0","  geom_point(size=0.1, position=""jitter"") +"
+"0","  geom_smooth(size=0.2, method=lm, se=FALSE, fullrange=TRUE, color = ""red"") +"
+"0","  facet_wrap(~ obesity_level, nrow = 2)"

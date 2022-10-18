@@ -1,0 +1,8 @@
+"0","mts %>%"
+"0","  unnest_tokens(word, transcription) %>%"
+"0","  group_by(medical_specialty) %>%"
+"0","  count(word, sort = TRUE) %>%"
+"0","  filter(!(word %in% stop_words$word) & !grepl(pattern = ""^[0-9]+$"", x = word)) %>%"
+"0","  top_n(5, n) %>%"
+"0","  arrange(medical_specialty, desc(n)) %>%"
+"0","knitr::kable()"

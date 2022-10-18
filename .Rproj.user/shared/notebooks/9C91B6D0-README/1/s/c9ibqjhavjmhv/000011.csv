@@ -1,0 +1,5 @@
+"0","ptbigram <- mts %>%"
+"0","  unnest_ngrams(bigram, transcription, n = 2) %>%"
+"0","  separate(bigram, into = c(""word1"", ""word2""), sep = "" "") %>%"
+"0","  select(word1, word2) %>%"
+"0","  filter(word1 == ""patient"" | word2 == ""patient"")"

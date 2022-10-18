@@ -1,0 +1,3 @@
+"0","met_avg[!is.na(dew.point)] %>%"
+"0","  ggplot(mapping = aes(x = region, y = dew.point)) + "
+"0","    stat_summary(fun.data = ""mean_sdl"", geom = ""errorbar"")"

@@ -1,0 +1,1 @@
+"0","pal_obe <- colorNumeric(c('darkblue','goldenrod','darkred'), domain=merged$obesity_percentage)"

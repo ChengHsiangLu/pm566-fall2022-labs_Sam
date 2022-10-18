@@ -1,0 +1,6 @@
+"0","mts %>%"
+"0","  unnest_ngrams(bigram, transcription, n=2) %>%"
+"0","  count(bigram, sort = TRUE) %>%"
+"0","  top_n(20, n) %>%"
+"0","  ggplot(aes(n, fct_reorder(bigram, n))) +"
+"0","  geom_col()"

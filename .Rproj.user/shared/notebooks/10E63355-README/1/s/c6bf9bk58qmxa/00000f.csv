@@ -1,0 +1,4 @@
+"0","repstation <- station_avg[, .("
+"0","  eucdist = min(eucdist, na.rm = T))"
+"0","  , by = STATE]"
+"0",""

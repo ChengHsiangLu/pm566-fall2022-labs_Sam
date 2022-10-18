@@ -1,0 +1,4 @@
+"0","merged[, bmi := fcoalesce(bmi, mean(bmi, na.rm = TRUE)), "
+"0","       by = .(male, hispanic)]"
+"0","merged[, fev := fcoalesce(fev, mean(fev, na.rm = TRUE)), "
+"0","       by = .(male, hispanic)]"

@@ -1,0 +1,5 @@
+"0","stmeds <- station_avg[ , .("
+"0","  temp50 = median(temp, na.rm = T),"
+"0","  windsp50 = median(wind.sp, na.rm = T),"
+"0","  atmpress50 = median(atm.press, na.rm = T)"
+"0",")]"

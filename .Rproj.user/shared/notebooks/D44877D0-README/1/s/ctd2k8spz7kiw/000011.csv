@@ -1,0 +1,5 @@
+"0","merged[!is.na(merged$obesity_level)][, .("
+"0","  bmi_min = min(bmi, na.rm = T),"
+"0","  bmi_max = max(bmi, na.rm = T), "
+"0","  bmi_length = length(bmi)"
+"0","), by=""obesity_level""]"

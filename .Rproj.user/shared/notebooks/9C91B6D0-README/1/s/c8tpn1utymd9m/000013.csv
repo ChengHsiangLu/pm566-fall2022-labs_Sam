@@ -1,0 +1,6 @@
+"0","mts %>%"
+"0","  unnest_ngrams(trigram, transcription, n=3) %>%"
+"0","  count(trigram, sort = TRUE) %>%"
+"0","  top_n(20, n) %>%"
+"0","  ggplot(aes(n, fct_reorder(trigram, n))) +"
+"0","  geom_col()"

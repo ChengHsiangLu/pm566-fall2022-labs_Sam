@@ -1,0 +1,2 @@
+"0","station_avg[ ,"
+"0","        temp_dist50 := abs(temp - statmedians$temp50)][order(temp_dist50)]"

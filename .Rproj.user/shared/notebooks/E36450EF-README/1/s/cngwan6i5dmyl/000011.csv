@@ -1,0 +1,6 @@
+"0","merged[!is.na(diabetes_percentage)][!is.na(region)] %>%"
+"0","  ggplot() + "
+"0","    stat_summary(mapping = aes(x = region, y = diabetes_percentage),"
+"0","    fun.min = min,"
+"0","    fun.max = max,"
+"0","    fun = median)"

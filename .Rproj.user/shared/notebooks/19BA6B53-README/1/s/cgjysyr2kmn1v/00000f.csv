@@ -1,0 +1,54 @@
+"0","rh.pal <- colorNumeric(c('darkgreen','goldenrod','brown'), domain=met_avg$rh)"
+"0","rh.pal"
+"1","function (x) 
+"
+"1","{
+"
+"1","    if (length(x) == 0 || all(is.na(x))) {
+"
+"1","        return(pf(x))
+"
+"1","    }
+"
+"1","    if (is.null(rng)) 
+"
+"1","        rng <- range(x, na.rm = TRUE)
+"
+"1","    rescaled <- scales::rescale(x, from = rng)
+"
+"1","    if (any(rescaled < 0 | rescaled > 1, na.rm = TRUE)) 
+"
+"1","        warning(""Some values were outside the color scale and will be treated as NA"")
+"
+"1","    if (reverse) {
+"
+"1","        rescaled <- 1 - rescaled
+"
+"1","    }
+"
+"1","    pf(rescaled)
+"
+"1","}
+"
+"1","<bytecode: 0x7fc95555fd80>
+"
+"1","<environment: 0x7fc8e579a618>
+"
+"1","attr(,""colorType"")"
+"1","
+"
+"1","[1]"
+"1"," ""numeric"""
+"1","
+"
+"1","attr(,""colorArgs"")"
+"1","
+"
+"1","attr(,""colorArgs"")$na.color
+"
+"1","[1]"
+"1"," ""#808080"""
+"1","
+"
+"1","
+"

@@ -1,0 +1,8 @@
+"0","test <- merge("
+"0","  x = station_avg,"
+"0","  y = repstation,"
+"0","  by.x = c(""eucdist"", ""STATE""),"
+"0","  by.y = c(""eucdist"", ""STATE""),"
+"0","  all.x = FALSE,"
+"0","  all.y = TRUE"
+"0",")"

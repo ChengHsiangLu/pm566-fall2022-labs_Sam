@@ -1,0 +1,3 @@
+"0","ggplot(merged[!is.na(diabetes_percentage)][!is.na(region)], aes(x=region, y=diabetes_percentage, color=region)) +"
+"0","  geom_boxplot() +"
+"0","  scale_color_brewer(palette=""Set2"")"

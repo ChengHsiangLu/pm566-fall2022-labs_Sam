@@ -1,0 +1,8 @@
+"0","merged[, .("
+"0","    fev_avg      = mean(fev, na.rm=TRUE),"
+"0","    fev_sd      = sd(fev, na.rm=TRUE),"
+"0","    asthma_avg      = mean(asthma, na.rm=TRUE),"
+"0","    asthma_sd      = sd(asthma, na.rm=TRUE)"
+"0","    ),"
+"0","    by = obesity_level"
+"0","    ][order(obesity_level)]"

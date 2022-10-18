@@ -1,0 +1,7 @@
+"0","ptbigram %>%"
+"0","  filter(word2 == ""patient"") %>%"
+"0","  count(word1, sort = TRUE) %>%"
+"0","  anti_join(stop_words, by = c(""word1"" = ""word"")) %>%"
+"0","  top_n(10) %>%"
+"0","knitr::kable()"
+"2","Selecting by n"

@@ -1,0 +1,5 @@
+"0","ggplot(data = merged[!is.na(obesity_level)][!is.na(smoke_gas_exposure)]) + "
+"0","  geom_bar(mapping = aes(x = smoke_gas_exposure, fill = obesity_level), show.legend = T, width = 1,"
+"0","           alpha=0.8, position=""identity"") + "
+"0","  theme(aspect.ratio = 1) +"
+"0","  labs(x = NULL, y = NULL)"

@@ -1,0 +1,2 @@
+"0","ggplot(merged[!is.na(merged$smoke_gas_exposure)], aes(x=smoke_gas_exposure, y=fev, color=smoke_gas_exposure)) +"
+"0","  geom_boxplot()"
