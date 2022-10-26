@@ -46,9 +46,9 @@ microbenchmark::microbenchmark(
 ```
 
     ## Unit: microseconds
-    ##       expr     min       lq      mean   median       uq      max neval
-    ##     fun1() 679.713 843.3655 1240.7212 1135.733 1278.942 5265.548   100
-    ##  fun1alt()  33.082  38.9785  142.0054   42.589   48.978 9468.918   100
+    ##       expr     min      lq      mean    median        uq      max neval
+    ##     fun1() 713.315 832.535 1215.4279 1101.1005 1210.5330 5992.219   100
+    ##  fun1alt()  34.609  39.068  109.9477   42.7305   52.0415 4220.418   100
 
 ``` r
 d <- matrix(1:16, ncol = 4)

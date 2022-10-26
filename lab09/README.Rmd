@@ -2,7 +2,11 @@
 title: "lab09"
 author: "sl"
 date: "`r Sys.Date()`"
-output: github_document
+output: 
+     pdf_document: default
+     html_document: default
+     github_document:
+        html_preview: false
 always_allow_html: true
 ---
 
