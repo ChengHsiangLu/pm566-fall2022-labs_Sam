@@ -3,11 +3,9 @@ title: "lab09"
 author: "sl"
 date: "`r Sys.Date()`"
 output: 
-     pdf_document: default
-     word_document: default
-     html_document: default
      github_document:
         html_preview: false
+     html_document: default
 always_allow_html: true
 ---
 
@@ -98,6 +96,62 @@ microbenchmark::microbenchmark(
 
 ```
 
+
+## Problem 4. Show PSOCK cluster example
+
+```{r}
+library(parallel)
+my_boot <- function(dat, stat, R, ncpus = 1L) {
+  
+  # Getting the random indices
+  n <- nrow(dat)
+  idx <- matrix(sample.int(n, n*R, TRUE), nrow=n, ncol=R)
+ 
+  # Making the cluster using `ncpus`
+  # STEP 1: GOES HERE
+  cl <- makePSOCKcluster(4)  
+  clusterSetRNGStream(cl, 123) # Equivalent to `set.seed(123)`
+  
+  # STEP 2: GOES HERE
+  
+  clusterExport(cl, c("stat", "dat", "idx"), envir = environment())
+  
+    # STEP 3: THIS FUNCTION NEEDS TO BE REPLACES WITH parLapply
+  ans <- parLapply(cl, seq_len(R), function(i) {
+    stat(dat[idx[,i], , drop=FALSE])
+  })
+  
+  # Coercing the list into a matrix
+  ans <- do.call(rbind, ans)
+  
+  # STEP 4: GOES HERE
+  
+  ans
+  
+}
+```
+
+```{r}
+# Bootstrap of an OLS
+my_stat <- function(d) coef(lm(y ~ x, data=d))
+
+# DATA SIM
+set.seed(1)
+n <- 500; R <- 1e4
+
+x <- cbind(rnorm(n)); y <- x*5 + rnorm(n)
+
+# Checking if we get something similar as lm
+ans0 <- confint(lm(y~x))
+ans1 <- my_boot(dat = data.frame(x, y), my_stat, R = R, ncpus = 2L)
+#stopCluster(cl)
+
+# You should get something like this
+t(apply(ans1, 2, quantile, c(.025,.975)))
+
+ans0
+
+```
 
 
 
