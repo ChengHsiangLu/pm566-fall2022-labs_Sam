@@ -1,0 +1,163 @@
+---
+title: "assignment03"
+author: "sl"
+date: "`r Sys.Date()`"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rvest)
+library(httr)
+library(tidyverse)
+library(stringr)
+library(data.table)
+library(xml2)
+```
+
+```{r}
+setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/Assignment/assignment03/")
+```
+
+## Using the NCBI API, look for papers that show up under the term “sars-cov-2 trial vaccine.” Look for the data in the pubmed database, and then retrieve the details of the paper as shown in lab 7. How many papers were you able to find?
+
+```{r}
+# Downloading the website
+website <- xml2::read_html("https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2%20trial%20vaccine")
+
+# Finding the counts
+counts <- xml2::xml_find_first(website, "/html/body/main/div[9]/div[2]/div[2]/div[1]/div[1]")
+
+# Turning it into text
+counts <- as.character(counts)
+
+# Extracting the data using regex
+stringr::str_extract(counts, "[0-9,]+")
+```
+
+## Using the list of pubmed ids you retrieved, download each papers’ details using the query parameter rettype = abstract. If you get more than 250 ids, just keep the first 250.
+
+```{r}
+library(httr)
+query_ids <- GET(
+  url   = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
+  query = list(
+    db      = "pubmed",
+    term = "sars-cov-2 trial vaccine.",
+    rettype = "abstract",
+    retmax  = 250)
+)
+
+# Extracting the content of the response of GET
+ids <- httr::content(query_ids)
+```
+
+Get details about the articles
+
+```{r}
+# Turn the result into a character vector
+ids <- as.character(ids)
+
+# Find all the ids 
+ids <- stringr::str_extract_all(ids, "<Id>[[:digit:]]+</Id>")[[1]]
+
+# Remove all the leading and trailing <Id> </Id>. Make use of "|"
+ids <- stringr::str_remove_all(ids, "</?Id>")
+
+head(ids)
+```
+
+```{r}
+publications <- GET(
+  url   = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
+  query = list(
+    db  = "pubmed",
+    id  = paste(ids,collapse = ","),
+  retmax = 250,
+  rettype = "abstract"
+    )
+)
+# Extracting the content of the response of GET
+publications <- httr::content(publications)
+```
+
+## As we did in lab 7. Create a dataset containing the following:
+
+Pubmed ID number,
+Title of the paper,
+Name of the journal where it was published,
+Publication date, and
+Abstract of the paper (if any).
+
+```{r}
+pub_char_list <- xml2::xml_children(publications)
+pub_char_list <- sapply(pub_char_list, as.character)
+```
+
+Now, extract the abstract and article title for each one of the elements of pub_char_list. You can either use sapply() as we just did, or simply take advantage of vectorization of stringr::str_extract
+
+```{r}
+abstracts <- str_extract(pub_char_list, "<Abstract>[[:print:][:space:]]+</Abstract>")
+#abstracts[[1]]
+abstracts <- str_remove_all(abstracts, "</?[[:alnum:]- =\"]+>") 
+#abstracts[[1]]
+abstracts <- str_replace_all(abstracts, "[[:space:]]+"," ")
+abstracts[[1]]
+```
+
+Now get the titles:
+
+```{r}
+titles <- str_extract(pub_char_list, "<ArticleTitle>[[:print:][:space:]]+</ArticleTitle>")
+#titles[[1]]
+titles <- str_remove_all(titles, "</?[[:alnum:]- =\"]+>")
+titles[[1]]
+```
+
+## Name of the journal where it was published
+
+```{r}
+names <- str_extract(pub_char_list, "<Title>[[:print:][:space:]]+</Title>")
+#names[[1]]
+names <- str_remove_all(names, "</?[[:alnum:]- =\"]+>")
+names[[1]]
+```
+
+## Publication date
+
+```{r}
+years <- str_extract(pub_char_list, "<Year>[[:print:]]+</Year>")
+#years[[1]]
+years <- str_remove_all(years, "</?[[:alnum:]- =\"]+>")
+years[[1]]
+```
+
+```{r}
+months <- str_extract(pub_char_list, "<Month>[[:print:]]+</Month>")
+#months[[1]]
+months <- str_remove_all(months, "</?[[:alnum:]- =\"]+>")
+months[[1]]
+```
+
+```{r}
+days <- str_extract(pub_char_list, "<Day>[[:print:]]+</Day>")
+#days[[1]]
+days <- str_remove_all(days, "</?[[:alnum:]- =\"]+>")
+days[[1]]
+```
+Finally the dataset:
+
+```{r}
+database <- data.frame(
+  PubMedId = ids,
+  Title    = titles,
+  Journal  = names,
+  Year     = years,
+  month    = months,
+  Day      = days,
+  Abstract = abstracts
+)
+knitr::kable(database[1:8,], caption = "Some papers about sars-cov-2 trial vaccine.")
+```
+
