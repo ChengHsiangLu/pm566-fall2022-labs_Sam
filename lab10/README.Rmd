@@ -1,0 +1,87 @@
+---
+title: "lab10"
+author: "sl"
+date: "`r Sys.Date()`"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) 
+```
+
+## Data setup
+
+```{r}
+# install.packages(c("RSQLite", "DBI"))
+
+library(RSQLite)
+library(DBI)
+
+# Initialize a temporary in memory database
+con <- dbConnect(SQLite(), ":memory:")
+
+# Download tables
+actor <- read.csv("https://raw.githubusercontent.com/ivanceras/sakila/master/csv-sakila-db/actor.csv")
+rental <- read.csv("https://raw.githubusercontent.com/ivanceras/sakila/master/csv-sakila-db/rental.csv")
+customer <- read.csv("https://raw.githubusercontent.com/ivanceras/sakila/master/csv-sakila-db/customer.csv")
+payment <- read.csv("https://raw.githubusercontent.com/ivanceras/sakila/master/csv-sakila-db/payment_p2007_01.csv")
+
+# Copy data.frames to database
+dbWriteTable(con, "actor", actor)
+dbWriteTable(con, "rental", rental)
+dbWriteTable(con, "customer", customer)
+dbWriteTable(con, "payment", payment)
+dbListTables(con)
+```
+
+```{sql, connection = con, output.var = "x1"}
+PRAGMA table_info(actor)
+```
+
+```{r}
+x1
+```
+
+```{sql, connection = con}
+PRAGMA table_info(actor)
+```
+
+## Exercise 1
+Retrieve the actor ID, first name and last name for all actors using the actor table. Sort by last name and then by first name.
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT actor_id, first_name, last_name
+  FROM actor
+  ORDER by first_name, first_name
+  ")
+```
+
+## Use SQL
+
+```{sql, connection = con}
+SELECT actor_id, first_name, last_name
+FROM actor
+ORDER by first_name, first_name
+```
+
+
+## Exercise 2
+Retrive the actor ID, first name, and last name for actors whose last name equals ‘WILLIAMS’ or ‘DAVIS’.
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT actor_id, first_name, last_name
+  FROM actor
+  WHERE first_name = 'WILLIAMS'
+  ")
+```
+
+```{r}
+# clean up
+dbDisconnect(con)
+```
+
