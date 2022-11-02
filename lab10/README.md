@@ -586,6 +586,36 @@ LIMIT 10
 The following query calculates a number of summary statistics for the
 payment table using MAX, MIN, AVG and SUM
 
+``` r
+dbGetQuery(con,
+  "
+  SELECT
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
+  FROM payment
+  ")
+```
+
+    ##   max_payment min_payment avg_payment sum_payment
+    ## 1       11.99        0.99    4.169775     4824.43
+
+``` sql
+SELECT
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
+FROM payment
+```
+
+| max_payment | min_payment | avg_payment | sum_payment |
+|------------:|------------:|------------:|------------:|
+|       11.99 |        0.99 |    4.169775 |     4824.43 |
+
+1 records
+
 ### Exercise 7.1
 
 Modify the above query to do those calculations for each customer_id
@@ -594,36 +624,112 @@ Modify the above query to do those calculations for each customer_id
 dbGetQuery(con,
   "
   SELECT customer_id,
-    MAX(amount) AS max,
-    MIN(amount) AS min,
-    AVG(amount) AS avg,
-    SUM(amount) AS sum
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
   FROM payment
+  GROUP BY customer_id
+  LIMIT 10
   ")
 ```
 
-    ##   customer_id   max  min      avg     sum
-    ## 1         269 11.99 0.99 4.169775 4824.43
+    ##    customer_id max_payment min_payment avg_payment sum_payment
+    ## 1            1        2.99        0.99    1.990000        3.98
+    ## 2            2        4.99        4.99    4.990000        4.99
+    ## 3            3        2.99        1.99    2.490000        4.98
+    ## 4            5        6.99        0.99    3.323333        9.97
+    ## 5            6        4.99        0.99    2.990000        8.97
+    ## 6            7        5.99        0.99    4.190000       20.95
+    ## 7            8        6.99        6.99    6.990000        6.99
+    ## 8            9        4.99        0.99    3.656667       10.97
+    ## 9           10        4.99        4.99    4.990000        4.99
+    ## 10          11        6.99        6.99    6.990000        6.99
 
 ``` sql
 SELECT customer_id,
-    MAX(amount) AS max,
-    MIN(amount) AS min,
-    AVG(amount) AS avg,
-    SUM(amount) AS sum
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
 FROM payment
+GROUP BY customer_id
+LIMIT 10
 ```
 
-| customer_id |   max |  min |      avg |     sum |
-|------------:|------:|-----:|---------:|--------:|
-|         269 | 11.99 | 0.99 | 4.169775 | 4824.43 |
+| customer_id | max_payment | min_payment | avg_payment | sum_payment |
+|------------:|------------:|------------:|------------:|------------:|
+|           1 |        2.99 |        0.99 |    1.990000 |        3.98 |
+|           2 |        4.99 |        4.99 |    4.990000 |        4.99 |
+|           3 |        2.99 |        1.99 |    2.490000 |        4.98 |
+|           5 |        6.99 |        0.99 |    3.323333 |        9.97 |
+|           6 |        4.99 |        0.99 |    2.990000 |        8.97 |
+|           7 |        5.99 |        0.99 |    4.190000 |       20.95 |
+|           8 |        6.99 |        6.99 |    6.990000 |        6.99 |
+|           9 |        4.99 |        0.99 |    3.656667 |       10.97 |
+|          10 |        4.99 |        4.99 |    4.990000 |        4.99 |
+|          11 |        6.99 |        6.99 |    6.990000 |        6.99 |
 
-1 records
+Displaying records 1 - 10
 
 ### Exercise 7.2
 
 Modify the above query to only keep the customer_ids that have more then
 5 payments
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT customer_id, COUNT(*) AS N,
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
+  FROM payment
+  GROUP BY customer_id
+  HAVING N > 5
+  LIMIT 10
+  ")
+```
+
+    ##    customer_id N max_payment min_payment avg_payment sum_payment
+    ## 1           19 6        9.99        0.99    4.490000       26.94
+    ## 2           53 6        9.99        0.99    4.490000       26.94
+    ## 3          109 7        7.99        0.99    3.990000       27.93
+    ## 4          161 6        5.99        0.99    2.990000       17.94
+    ## 5          197 8        3.99        0.99    2.615000       20.92
+    ## 6          207 6        6.99        0.99    2.990000       17.94
+    ## 7          239 6        7.99        2.99    5.656667       33.94
+    ## 8          245 6        8.99        0.99    4.823333       28.94
+    ## 9          251 6        4.99        1.99    3.323333       19.94
+    ## 10         269 6        6.99        0.99    3.156667       18.94
+
+``` sql
+SELECT customer_id, COUNT(*) AS N,
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
+FROM payment
+GROUP BY customer_id
+HAVING N > 5
+LIMIT 10
+```
+
+| customer_id |   N | max_payment | min_payment | avg_payment | sum_payment |
+|------------:|----:|------------:|------------:|------------:|------------:|
+|          19 |   6 |        9.99 |        0.99 |    4.490000 |       26.94 |
+|          53 |   6 |        9.99 |        0.99 |    4.490000 |       26.94 |
+|         109 |   7 |        7.99 |        0.99 |    3.990000 |       27.93 |
+|         161 |   6 |        5.99 |        0.99 |    2.990000 |       17.94 |
+|         197 |   8 |        3.99 |        0.99 |    2.615000 |       20.92 |
+|         207 |   6 |        6.99 |        0.99 |    2.990000 |       17.94 |
+|         239 |   6 |        7.99 |        2.99 |    5.656667 |       33.94 |
+|         245 |   6 |        8.99 |        0.99 |    4.823333 |       28.94 |
+|         251 |   6 |        4.99 |        1.99 |    3.323333 |       19.94 |
+|         269 |   6 |        6.99 |        0.99 |    3.156667 |       18.94 |
+
+Displaying records 1 - 10
 
 ## Cleanup
 

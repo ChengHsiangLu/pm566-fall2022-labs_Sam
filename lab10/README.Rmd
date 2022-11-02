@@ -290,6 +290,27 @@ LIMIT 10
 ## Exercise 7
 The following query calculates a number of summary statistics for the payment table using MAX, MIN, AVG and SUM
 
+```{r}
+dbGetQuery(con,
+  "
+  SELECT
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
+  FROM payment
+  ")
+```
+
+```{sql, connection = con}
+SELECT
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
+FROM payment
+```
+
 ### Exercise 7.1
 Modify the above query to do those calculations for each customer_id
 
@@ -297,32 +318,56 @@ Modify the above query to do those calculations for each customer_id
 dbGetQuery(con,
   "
   SELECT customer_id,
-    MAX(amount) AS max,
-    MIN(amount) AS min,
-    AVG(amount) AS avg,
-    SUM(amount) AS sum
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
   FROM payment
+  GROUP BY customer_id
+  LIMIT 10
   ")
 ```
 
 ```{sql, connection = con}
 SELECT customer_id,
-    MAX(amount) AS max,
-    MIN(amount) AS min,
-    AVG(amount) AS avg,
-    SUM(amount) AS sum
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
 FROM payment
+GROUP BY customer_id
+LIMIT 10
 ```
+
 
 ### Exercise 7.2
 Modify the above query to only keep the customer_ids that have more then 5 payments
 
 ```{r}
-
+dbGetQuery(con,
+  "
+  SELECT customer_id, COUNT(*) AS N,
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
+  FROM payment
+  GROUP BY customer_id
+  HAVING N > 5
+  LIMIT 10
+  ")
 ```
 
-```{r}
-
+```{sql, connection = con}
+SELECT customer_id, COUNT(*) AS N,
+    MAX(amount) AS max_payment,
+    MIN(amount) AS min_payment,
+    AVG(amount) AS avg_payment,
+    SUM(amount) AS sum_payment
+FROM payment
+GROUP BY customer_id
+HAVING N > 5
+LIMIT 10
 ```
 
 ## Cleanup
