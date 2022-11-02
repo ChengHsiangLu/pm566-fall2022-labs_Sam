@@ -6,11 +6,25 @@ sl
 ## Data setup
 
 ``` r
+if (!require(RSQLite)) install.packages(c("RSQLite"))
+```
+
+    ## Loading required package: RSQLite
+
+``` r
+if (!require(DBI)) install.packages(c("DBI"))
+```
+
+    ## Loading required package: DBI
+
+``` r
 # install.packages(c("RSQLite", "DBI"))
 
 library(RSQLite)
 library(DBI)
+```
 
+``` r
 # Initialize a temporary in memory database
 con <- dbConnect(SQLite(), ":memory:")
 
@@ -68,225 +82,29 @@ dbGetQuery(con,
   SELECT actor_id, first_name, last_name
   FROM actor
   ORDER by first_name, first_name
+  LIMIT 10
   ")
 ```
 
-    ##     actor_id  first_name    last_name
-    ## 1         71        ADAM        GRANT
-    ## 2        132        ADAM       HOPPER
-    ## 3        165          AL      GARLAND
-    ## 4        173        ALAN     DREYFUSS
-    ## 5        125      ALBERT        NOLTE
-    ## 6        146      ALBERT    JOHANSSON
-    ## 7         29        ALEC        WAYNE
-    ## 8         65      ANGELA       HUDSON
-    ## 9        144      ANGELA  WITHERSPOON
-    ## 10        76    ANGELINA      ASTAIRE
-    ## 11        49        ANNE       CRONYN
-    ## 12        34      AUDREY      OLIVIER
-    ## 13       190      AUDREY       BAILEY
-    ## 14       196        BELA       WALKEN
-    ## 15        83         BEN       WILLIS
-    ## 16       152         BEN       HARRIS
-    ## 17         6       BETTE    NICHOLSON
-    ## 18        19         BOB      FAWCETT
-    ## 19        36        BURT      DUKAKIS
-    ## 20        75        BURT        POSEY
-    ## 21       193        BURT       TEMPLE
-    ## 22        24     CAMERON       STREEP
-    ## 23        63     CAMERON         WRAY
-    ## 24       111     CAMERON    ZELLWEGER
-    ## 25        52      CARMEN         HUNT
-    ## 26        77        CARY  MCCONAUGHEY
-    ## 27       128        CATE      MCQUEEN
-    ## 28       141        CATE       HARRIS
-    ## 29        89    CHARLIZE        DENCH
-    ## 30        98       CHRIS      BRIDGES
-    ## 31       160       CHRIS         DEPP
-    ## 32        10   CHRISTIAN        GABLE
-    ## 33        58   CHRISTIAN       AKROYD
-    ## 34        61   CHRISTIAN       NEESON
-    ## 35        91 CHRISTOPHER        BERRY
-    ## 36       163 CHRISTOPHER         WEST
-    ## 37        15        CUBA      OLIVIER
-    ## 38       118        CUBA        ALLEN
-    ## 39       189        CUBA        BIRCH
-    ## 40        18         DAN         TORN
-    ## 41        56         DAN       HARRIS
-    ## 42       116         DAN       STREEP
-    ## 43        95       DARYL     WAHLBERG
-    ## 44       129       DARYL     CRAWFORD
-    ## 45       182      DEBBIE       AKROYD
-    ## 46        59      DUSTIN       TAUTOU
-    ## 47         3          ED        CHASE
-    ## 48       136          ED    MANSFIELD
-    ## 49       179          ED      GUINESS
-    ## 50        93       ELLEN      PRESLEY
-    ## 51        22       ELVIS         MARX
-    ## 52       148       EMILY          DEE
-    ## 53       139        EWAN      GOODING
-    ## 54        55         FAY       KILMER
-    ## 55       147         FAY      WINSLET
-    ## 56       156         FAY         WOOD
-    ## 57        48     FRANCES    DAY-LEWIS
-    ## 58       126     FRANCES        TOMEI
-    ## 59        16        FRED      COSTNER
-    ## 60        51        GARY      PHOENIX
-    ## 61        73        GARY         PENN
-    ## 62        96        GENE       WILLIS
-    ## 63       134        GENE      HOPKINS
-    ## 64       177        GENE     MCKELLEN
-    ## 65       151    GEOFFREY       HESTON
-    ## 66       107        GINA    DEGENERES
-    ## 67        39      GOLDIE        BRODY
-    ## 68         7       GRACE       MOSTEL
-    ## 69        86        GREG      CHAPLIN
-    ## 70       191     GREGORY      GOODING
-    ## 71       130       GRETA       KEITEL
-    ## 72       157       GRETA       MALDEN
-    ## 73        78     GROUCHO      SINATRA
-    ## 74       106     GROUCHO        DUNST
-    ## 75       172     GROUCHO     WILLIAMS
-    ## 76       115    HARRISON         BALE
-    ## 77       161      HARVEY         HOPE
-    ## 78        17       HELEN       VOIGHT
-    ## 79        60       HENRY        BERRY
-    ## 80       164    HUMPHREY       WILLIS
-    ## 81       184    HUMPHREY      GARLAND
-    ## 82       155         IAN        TANDY
-    ## 83       142        JADA        RYDER
-    ## 84        84       JAMES         PITT
-    ## 85       131        JANE      JACKMAN
-    ## 86        62       JAYNE       NEESON
-    ## 87       150       JAYNE        NOLTE
-    ## 88       195       JAYNE  SILVERSTONE
-    ## 89       180        JEFF  SILVERSTONE
-    ## 90         4    JENNIFER        DAVIS
-    ## 91        67     JESSICA       BAILEY
-    ## 92        99         JIM       MOSTEL
-    ## 93        41       JODIE    DEGENERES
-    ## 94         9         JOE        SWANK
-    ## 95       192        JOHN       SUVARI
-    ## 96         5      JOHNNY LOLLOBRIGIDA
-    ## 97        40      JOHNNY         CAGE
-    ## 98       176         JON        CHASE
-    ## 99        57        JUDE       CRUISE
-    ## 100       35        JUDY         DEAN
-    ## 101       27       JULIA      MCQUEEN
-    ## 102       47       JULIA    BARRYMORE
-    ## 103      186       JULIA    ZELLWEGER
-    ## 104      199       JULIA      FAWCETT
-    ## 105      123    JULIANNE        DENCH
-    ## 106       12        KARL        BERRY
-    ## 107       69     KENNETH      PALTROW
-    ## 108       88     KENNETH        PESCI
-    ## 109       94     KENNETH         TORN
-    ## 110      169     KENNETH      HOFFMAN
-    ## 111       25       KEVIN        BLOOM
-    ## 112      127       KEVIN      GARLAND
-    ## 113      145         KIM        ALLEN
-    ## 114       43        KIRK     JOVOVICH
-    ## 115       21     KIRSTEN      PALTROW
-    ## 116       92     KIRSTEN       AKROYD
-    ## 117      159       LAURA        BRODY
-    ## 118      167    LAURENCE      BULLOCK
-    ## 119      178        LISA       MONROE
-    ## 120      121        LIZA      BERGMAN
-    ## 121       20     LUCILLE        TRACY
-    ## 122      138     LUCILLE          DEE
-    ## 123       79         MAE      HOFFMAN
-    ## 124       66        MARY        TANDY
-    ## 125      198        MARY       KEITEL
-    ## 126        8     MATTHEW    JOHANSSON
-    ## 127      103     MATTHEW        LEIGH
-    ## 128      181     MATTHEW       CARREY
-    ## 129       97         MEG        HAWKE
-    ## 130       53        MENA       TEMPLE
-    ## 131      170        MENA       HOPPER
-    ## 132      154       MERYL       GIBSON
-    ## 133      194       MERYL        ALLEN
-    ## 134      174     MICHAEL       BENING
-    ## 135      185     MICHAEL       BOLGER
-    ## 136       70    MICHELLE  MCCONAUGHEY
-    ## 137       33       MILLA         PECK
-    ## 138       74       MILLA       KEITEL
-    ## 139       85      MINNIE    ZELLWEGER
-    ## 140      153      MINNIE       KILMER
-    ## 141      113      MORGAN      HOPKINS
-    ## 142      114      MORGAN    MCDORMAND
-    ## 143      137      MORGAN     WILLIAMS
-    ## 144       50     NATALIE      HOPKINS
-    ## 145        2        NICK     WAHLBERG
-    ## 146       44        NICK     STALLONE
-    ## 147      166        NICK    DEGENERES
-    ## 148      171     OLYMPIA     PFEIFFER
-    ## 149      162       OPRAH       KILMER
-    ## 150       46      PARKER     GOLDBERG
-    ## 151        1    PENELOPE      GUINESS
-    ## 152       54    PENELOPE      PINKETT
-    ## 153      104    PENELOPE       CRONYN
-    ## 154      120    PENELOPE       MONROE
-    ## 155       80       RALPH         CRUZ
-    ## 156       64         RAY    JOHANSSON
-    ## 157       45       REESE       KILMER
-    ## 158      197       REESE         WEST
-    ## 159      117       RENEE        TRACY
-    ## 160      187       RENEE         BALL
-    ## 161      133     RICHARD         PENN
-    ## 162       26         RIP     CRAWFORD
-    ## 163       68         RIP      WINSLET
-    ## 164      135        RITA     REYNOLDS
-    ## 165      143       RIVER         DEAN
-    ## 166      188        ROCK      DUKAKIS
-    ## 167      112     RUSSELL       BACALL
-    ## 168      149     RUSSELL       TEMPLE
-    ## 169      183     RUSSELL        CLOSE
-    ## 170      122       SALMA        NOLTE
-    ## 171       23      SANDRA       KILMER
-    ## 172       30      SANDRA         PECK
-    ## 173       81    SCARLETT        DAMON
-    ## 174      124    SCARLETT       BENING
-    ## 175       72        SEAN     WILLIAMS
-    ## 176       90        SEAN      GUINESS
-    ## 177      105      SIDNEY        CROWE
-    ## 178       31       SISSY     SOBIESKI
-    ## 179       87     SPENCER         PECK
-    ## 180      100     SPENCER         DEPP
-    ## 181      101       SUSAN        DAVIS
-    ## 182      110       SUSAN        DAVIS
-    ## 183      109   SYLVESTER         DERN
-    ## 184      200       THORA       TEMPLE
-    ## 185       32         TIM      HACKMAN
-    ## 186       38         TOM     MCKELLEN
-    ## 187       42         TOM      MIRANDA
-    ## 188      201         TOM       CRUISE
-    ## 189      202         TOM        HANKS
-    ## 190      203         TOM       CRUISE
-    ## 191      204         TOM        HANKS
-    ## 192      205         TOM       CRUISE
-    ## 193      206         TOM        HANKS
-    ## 194      207         TOM       CRUISE
-    ## 195      208         TOM        HANKS
-    ## 196       13         UMA         WOOD
-    ## 197       37         VAL       BOLGER
-    ## 198       14      VIVIEN       BERGEN
-    ## 199      158      VIVIEN     BASINGER
-    ## 200      102      WALTER         TORN
-    ## 201      108      WARREN        NOLTE
-    ## 202      119      WARREN      JACKMAN
-    ## 203      140      WHOOPI         HURT
-    ## 204      168        WILL       WILSON
-    ## 205      175     WILLIAM      HACKMAN
-    ## 206       28       WOODY      HOFFMAN
-    ## 207       82       WOODY        JOLIE
-    ## 208       11        ZERO         CAGE
+    ##    actor_id first_name   last_name
+    ## 1        71       ADAM       GRANT
+    ## 2       132       ADAM      HOPPER
+    ## 3       165         AL     GARLAND
+    ## 4       173       ALAN    DREYFUSS
+    ## 5       125     ALBERT       NOLTE
+    ## 6       146     ALBERT   JOHANSSON
+    ## 7        29       ALEC       WAYNE
+    ## 8        65     ANGELA      HUDSON
+    ## 9       144     ANGELA WITHERSPOON
+    ## 10       76   ANGELINA     ASTAIRE
 
-## Use SQL
+## Use SQL directly
 
 ``` sql
 SELECT actor_id, first_name, last_name
 FROM actor
 ORDER by first_name, first_name
+LIMIT 10
 ```
 
 | actor_id | first_name | last_name   |
@@ -306,7 +124,7 @@ Displaying records 1 - 10
 
 ## Exercise 2
 
-Retrive the actor ID, first name, and last name for actors whose last
+Retrieve the actor ID, first name, and last name for actors whose last
 name equals ‘WILLIAMS’ or ‘DAVIS’.
 
 ``` r
@@ -314,12 +132,502 @@ dbGetQuery(con,
   "
   SELECT actor_id, first_name, last_name
   FROM actor
-  WHERE first_name = 'WILLIAMS'
+  WHERE last_name IN ('WILLIAMS', 'DAVIS')
   ")
 ```
 
-    ## [1] actor_id   first_name last_name 
-    ## <0 rows> (or 0-length row.names)
+    ##   actor_id first_name last_name
+    ## 1        4   JENNIFER     DAVIS
+    ## 2       72       SEAN  WILLIAMS
+    ## 3      101      SUSAN     DAVIS
+    ## 4      110      SUSAN     DAVIS
+    ## 5      137     MORGAN  WILLIAMS
+    ## 6      172    GROUCHO  WILLIAMS
+
+``` sql
+SELECT actor_id, first_name, last_name
+FROM actor
+WHERE last_name IN ('WILLIAMS', 'DAVIS')
+```
+
+| actor_id | first_name | last_name |
+|---------:|:-----------|:----------|
+|        4 | JENNIFER   | DAVIS     |
+|       72 | SEAN       | WILLIAMS  |
+|      101 | SUSAN      | DAVIS     |
+|      110 | SUSAN      | DAVIS     |
+|      137 | MORGAN     | WILLIAMS  |
+|      172 | GROUCHO    | WILLIAMS  |
+
+6 records
+
+## Exercise 3
+
+Write a query against the rental table that returns the IDs of the
+customers who rented a film on July 5, 2005 (use the rental.rental_date
+column, and you can use the date() function to ignore the time
+component). Include a single row for each distinct customer ID.
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT DISTINCT customer_id, rental_date
+  FROM rental
+  WHERE date(rental_date) = '2005-07-05'
+  LIMIT 10
+  ")
+```
+
+    ##    customer_id         rental_date
+    ## 1          565 2005-07-05 22:49:24
+    ## 2          242 2005-07-05 22:51:44
+    ## 3           37 2005-07-05 22:56:33
+    ## 4           60 2005-07-05 22:57:34
+    ## 5          594 2005-07-05 22:59:53
+    ## 6            8 2005-07-05 23:01:21
+    ## 7          490 2005-07-05 23:02:37
+    ## 8          476 2005-07-05 23:05:17
+    ## 9          322 2005-07-05 23:05:44
+    ## 10         298 2005-07-05 23:08:53
+
+``` r
+#dbGetQuery(con,
+#  "
+#  SELECT customer_id, COUNT(*) AS N
+#  FROM rental
+#  WHERE date(rental_date) = '2005-07-05'
+#  GROUP BY customer_id
+#  ")
+```
+
+``` sql
+SELECT DISTINCT customer_id, rental_date
+FROM rental
+WHERE date(rental_date) = '2005-07-05'
+LIMIT 10
+```
+
+| customer_id | rental_date         |
+|------------:|:--------------------|
+|         565 | 2005-07-05 22:49:24 |
+|         242 | 2005-07-05 22:51:44 |
+|          37 | 2005-07-05 22:56:33 |
+|          60 | 2005-07-05 22:57:34 |
+|         594 | 2005-07-05 22:59:53 |
+|           8 | 2005-07-05 23:01:21 |
+|         490 | 2005-07-05 23:02:37 |
+|         476 | 2005-07-05 23:05:17 |
+|         322 | 2005-07-05 23:05:44 |
+|         298 | 2005-07-05 23:08:53 |
+
+Displaying records 1 - 10
+
+## Exercise 4
+
+### Exercise 4.1
+
+Construct a query that retrieve all rows from the payment table where
+the amount is either 1.99, 7.99, 9.99.
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT  *
+  FROM payment
+  WHERE amount IN (1.99, 7.99, 9.99)
+  LIMIT 10
+  ")
+```
+
+    ##    payment_id customer_id staff_id rental_id amount               payment_date
+    ## 1       16050         269        2         7   1.99 2007-01-24 21:40:19.996577
+    ## 2       16056         270        1       193   1.99 2007-01-26 05:10:14.996577
+    ## 3       16081         282        2        48   1.99 2007-01-25 04:49:12.996577
+    ## 4       16103         294        1       595   1.99 2007-01-28 12:28:20.996577
+    ## 5       16133         307        1       614   1.99 2007-01-28 14:01:54.996577
+    ## 6       16158         316        1      1065   1.99 2007-01-31 07:23:22.996577
+    ## 7       16160         318        1       224   9.99 2007-01-26 08:46:53.996577
+    ## 8       16161         319        1        15   9.99 2007-01-24 23:07:48.996577
+    ## 9       16180         330        2       967   7.99 2007-01-30 17:40:32.996577
+    ## 10      16206         351        1      1137   1.99 2007-01-31 17:48:40.996577
+
+``` sql
+SELECT  *
+FROM payment
+WHERE amount IN (1.99, 7.99, 9.99)
+LIMIT 10
+```
+
+| payment_id | customer_id | staff_id | rental_id | amount | payment_date               |
+|-----------:|------------:|---------:|----------:|-------:|:---------------------------|
+|      16050 |         269 |        2 |         7 |   1.99 | 2007-01-24 21:40:19.996577 |
+|      16056 |         270 |        1 |       193 |   1.99 | 2007-01-26 05:10:14.996577 |
+|      16081 |         282 |        2 |        48 |   1.99 | 2007-01-25 04:49:12.996577 |
+|      16103 |         294 |        1 |       595 |   1.99 | 2007-01-28 12:28:20.996577 |
+|      16133 |         307 |        1 |       614 |   1.99 | 2007-01-28 14:01:54.996577 |
+|      16158 |         316 |        1 |      1065 |   1.99 | 2007-01-31 07:23:22.996577 |
+|      16160 |         318 |        1 |       224 |   9.99 | 2007-01-26 08:46:53.996577 |
+|      16161 |         319 |        1 |        15 |   9.99 | 2007-01-24 23:07:48.996577 |
+|      16180 |         330 |        2 |       967 |   7.99 | 2007-01-30 17:40:32.996577 |
+|      16206 |         351 |        1 |      1137 |   1.99 | 2007-01-31 17:48:40.996577 |
+
+Displaying records 1 - 10
+
+### Exercise 4.2
+
+Construct a query that retrieve all rows from the payment table where
+the amount is greater then 5
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT  *
+  FROM payment
+  WHERE amount > 5
+  LIMIT 10
+  ")
+```
+
+    ##    payment_id customer_id staff_id rental_id amount               payment_date
+    ## 1       16052         269        2       678   6.99 2007-01-28 21:44:14.996577
+    ## 2       16058         271        1      1096   8.99 2007-01-31 11:59:15.996577
+    ## 3       16060         272        1       405   6.99 2007-01-27 12:01:05.996577
+    ## 4       16061         272        1      1041   6.99 2007-01-31 04:14:49.996577
+    ## 5       16068         274        1       394   5.99 2007-01-27 09:54:37.996577
+    ## 6       16073         276        1       860  10.99 2007-01-30 01:13:42.996577
+    ## 7       16074         277        2       308   6.99 2007-01-26 20:30:05.996577
+    ## 8       16082         282        2       282   6.99 2007-01-26 17:24:52.996577
+    ## 9       16086         284        1      1145   6.99 2007-01-31 18:42:11.996577
+    ## 10      16087         286        2        81   6.99 2007-01-25 10:43:45.996577
+
+``` sql
+SELECT  *
+FROM payment
+WHERE amount > 5
+LIMIT 10
+```
+
+| payment_id | customer_id | staff_id | rental_id | amount | payment_date               |
+|-----------:|------------:|---------:|----------:|-------:|:---------------------------|
+|      16052 |         269 |        2 |       678 |   6.99 | 2007-01-28 21:44:14.996577 |
+|      16058 |         271 |        1 |      1096 |   8.99 | 2007-01-31 11:59:15.996577 |
+|      16060 |         272 |        1 |       405 |   6.99 | 2007-01-27 12:01:05.996577 |
+|      16061 |         272 |        1 |      1041 |   6.99 | 2007-01-31 04:14:49.996577 |
+|      16068 |         274 |        1 |       394 |   5.99 | 2007-01-27 09:54:37.996577 |
+|      16073 |         276 |        1 |       860 |  10.99 | 2007-01-30 01:13:42.996577 |
+|      16074 |         277 |        2 |       308 |   6.99 | 2007-01-26 20:30:05.996577 |
+|      16082 |         282 |        2 |       282 |   6.99 | 2007-01-26 17:24:52.996577 |
+|      16086 |         284 |        1 |      1145 |   6.99 | 2007-01-31 18:42:11.996577 |
+|      16087 |         286 |        2 |        81 |   6.99 | 2007-01-25 10:43:45.996577 |
+
+Displaying records 1 - 10
+
+### Exercise 4.3
+
+Construct a query that retrives all rows from the payment table where
+the amount is greater then 5 and less then 8
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT  *
+  FROM payment
+  WHERE amount > 5 AND amount < 8
+  LIMIT 10
+  ")
+```
+
+    ##    payment_id customer_id staff_id rental_id amount               payment_date
+    ## 1       16052         269        2       678   6.99 2007-01-28 21:44:14.996577
+    ## 2       16060         272        1       405   6.99 2007-01-27 12:01:05.996577
+    ## 3       16061         272        1      1041   6.99 2007-01-31 04:14:49.996577
+    ## 4       16068         274        1       394   5.99 2007-01-27 09:54:37.996577
+    ## 5       16074         277        2       308   6.99 2007-01-26 20:30:05.996577
+    ## 6       16082         282        2       282   6.99 2007-01-26 17:24:52.996577
+    ## 7       16086         284        1      1145   6.99 2007-01-31 18:42:11.996577
+    ## 8       16087         286        2        81   6.99 2007-01-25 10:43:45.996577
+    ## 9       16092         288        2       427   6.99 2007-01-27 14:38:30.996577
+    ## 10      16094         288        2       565   5.99 2007-01-28 07:54:57.996577
+
+``` sql
+SELECT  *
+FROM payment
+WHERE amount > 5 AND amount < 8
+LIMIT 10
+```
+
+| payment_id | customer_id | staff_id | rental_id | amount | payment_date               |
+|-----------:|------------:|---------:|----------:|-------:|:---------------------------|
+|      16052 |         269 |        2 |       678 |   6.99 | 2007-01-28 21:44:14.996577 |
+|      16060 |         272 |        1 |       405 |   6.99 | 2007-01-27 12:01:05.996577 |
+|      16061 |         272 |        1 |      1041 |   6.99 | 2007-01-31 04:14:49.996577 |
+|      16068 |         274 |        1 |       394 |   5.99 | 2007-01-27 09:54:37.996577 |
+|      16074 |         277 |        2 |       308 |   6.99 | 2007-01-26 20:30:05.996577 |
+|      16082 |         282 |        2 |       282 |   6.99 | 2007-01-26 17:24:52.996577 |
+|      16086 |         284 |        1 |      1145 |   6.99 | 2007-01-31 18:42:11.996577 |
+|      16087 |         286 |        2 |        81 |   6.99 | 2007-01-25 10:43:45.996577 |
+|      16092 |         288 |        2 |       427 |   6.99 | 2007-01-27 14:38:30.996577 |
+|      16094 |         288 |        2 |       565 |   5.99 | 2007-01-28 07:54:57.996577 |
+
+Displaying records 1 - 10
+
+## Exercise 5
+
+Retrieve all the payment IDs and their amount from the customers whose
+last name is ‘DAVIS’.
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT c.customer_id, c.last_name, p.payment_id, p.amount
+  FROM customer AS c INNER JOIN payment AS p
+  ON c.customer_id = p.customer_id
+  WHERE c.last_name = 'DAVIS'
+  /*WHERE c.last_name IN ('DAVIS')*/
+  ")
+```
+
+    ##   customer_id last_name payment_id amount
+    ## 1           6     DAVIS      16685   4.99
+    ## 2           6     DAVIS      16686   2.99
+    ## 3           6     DAVIS      16687   0.99
+
+``` sql
+SELECT c.customer_id, c.last_name, p.payment_id, p.amount
+FROM customer AS c INNER JOIN payment AS p
+ON c.customer_id = p.customer_id
+WHERE c.last_name = 'DAVIS'
+```
+
+| customer_id | last_name | payment_id | amount |
+|------------:|:----------|-----------:|-------:|
+|           6 | DAVIS     |      16685 |   4.99 |
+|           6 | DAVIS     |      16686 |   2.99 |
+|           6 | DAVIS     |      16687 |   0.99 |
+
+3 records
+
+## Exercise 6
+
+### Exercise 6.1
+
+Use COUNT(\*) to count the number of rows in rental
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT  COUNT(*) AS N
+  FROM rental
+  ")
+```
+
+    ##       N
+    ## 1 16044
+
+``` sql
+SELECT  COUNT(*) AS N
+FROM rental
+```
+
+|     N |
+|------:|
+| 16044 |
+
+1 records
+
+### Exercise 6.2
+
+Use COUNT(\*) and GROUP BY to count the number of rentals for each
+customer_id
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT customer_id, COUNT(*) AS N
+  FROM rental
+  GROUP BY customer_id
+  LIMIT 10
+  ")
+```
+
+    ##    customer_id  N
+    ## 1            1 32
+    ## 2            2 27
+    ## 3            3 26
+    ## 4            4 22
+    ## 5            5 38
+    ## 6            6 28
+    ## 7            7 33
+    ## 8            8 24
+    ## 9            9 23
+    ## 10          10 25
+
+``` sql
+SELECT customer_id, COUNT(*) AS N
+FROM rental
+GROUP BY customer_id
+LIMIT 10
+```
+
+| customer_id |   N |
+|:------------|----:|
+| 1           |  32 |
+| 2           |  27 |
+| 3           |  26 |
+| 4           |  22 |
+| 5           |  38 |
+| 6           |  28 |
+| 7           |  33 |
+| 8           |  24 |
+| 9           |  23 |
+| 10          |  25 |
+
+Displaying records 1 - 10
+
+### Exercise 6.3
+
+Repeat the previous query and sort by the count in descending order
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT customer_id, COUNT(*) AS N
+  FROM rental
+  GROUP BY customer_id
+  ORDER BY N DESC
+  LIMIT 10
+  ")
+```
+
+    ##    customer_id  N
+    ## 1          148 46
+    ## 2          526 45
+    ## 3          236 42
+    ## 4          144 42
+    ## 5           75 41
+    ## 6          469 40
+    ## 7          197 40
+    ## 8          468 39
+    ## 9          178 39
+    ## 10         137 39
+
+``` sql
+SELECT customer_id, COUNT(*) AS N
+FROM rental
+GROUP BY customer_id
+ORDER BY N DESC
+LIMIT 10
+```
+
+| customer_id |   N |
+|------------:|----:|
+|         148 |  46 |
+|         526 |  45 |
+|         236 |  42 |
+|         144 |  42 |
+|          75 |  41 |
+|         469 |  40 |
+|         197 |  40 |
+|         468 |  39 |
+|         178 |  39 |
+|         137 |  39 |
+
+Displaying records 1 - 10
+
+### Exercise 6.4
+
+Repeat the previous query but use HAVING to only keep the groups with 40
+or more.
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT customer_id, COUNT(*) AS N
+  FROM rental
+  GROUP BY customer_id
+  HAVING N >= 40
+  ORDER BY N DESC
+  LIMIT 10
+  ")
+```
+
+    ##   customer_id  N
+    ## 1         148 46
+    ## 2         526 45
+    ## 3         236 42
+    ## 4         144 42
+    ## 5          75 41
+    ## 6         469 40
+    ## 7         197 40
+
+``` sql
+SELECT customer_id, COUNT(*) AS N
+FROM rental
+GROUP BY customer_id
+HAVING N >= 40
+ORDER BY N DESC
+LIMIT 10
+```
+
+| customer_id |   N |
+|------------:|----:|
+|         148 |  46 |
+|         526 |  45 |
+|         236 |  42 |
+|         144 |  42 |
+|          75 |  41 |
+|         469 |  40 |
+|         197 |  40 |
+
+7 records
+
+## Exercise 7
+
+The following query calculates a number of summary statistics for the
+payment table using MAX, MIN, AVG and SUM
+
+### Exercise 7.1
+
+Modify the above query to do those calculations for each customer_id
+
+``` r
+dbGetQuery(con,
+  "
+  SELECT customer_id,
+    MAX(amount) AS max,
+    MIN(amount) AS min,
+    AVG(amount) AS avg,
+    SUM(amount) AS sum
+  FROM payment
+  ")
+```
+
+    ##   customer_id   max  min      avg     sum
+    ## 1         269 11.99 0.99 4.169775 4824.43
+
+``` sql
+SELECT customer_id,
+    MAX(amount) AS max,
+    MIN(amount) AS min,
+    AVG(amount) AS avg,
+    SUM(amount) AS sum
+FROM payment
+```
+
+| customer_id |   max |  min |      avg |     sum |
+|------------:|------:|-----:|---------:|--------:|
+|         269 | 11.99 | 0.99 | 4.169775 | 4824.43 |
+
+1 records
+
+### Exercise 7.2
+
+Modify the above query to only keep the customer_ids that have more then
+5 payments
+
+## Cleanup
+
+Run the following chunk to disconnect from the connection.
 
 ``` r
 # clean up

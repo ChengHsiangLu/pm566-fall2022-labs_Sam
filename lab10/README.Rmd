@@ -8,16 +8,22 @@ always_allow_html: true
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE) 
+options(repos = c(CRAN = "http://cran.rstudio.com"))
 ```
 
 ## Data setup
 
 ```{r}
+if (!require(RSQLite)) install.packages(c("RSQLite"))
+if (!require(DBI)) install.packages(c("DBI"))
+
 # install.packages(c("RSQLite", "DBI"))
 
 library(RSQLite)
 library(DBI)
+```
 
+```{r}
 # Initialize a temporary in memory database
 con <- dbConnect(SQLite(), ":memory:")
 
@@ -56,30 +62,271 @@ dbGetQuery(con,
   SELECT actor_id, first_name, last_name
   FROM actor
   ORDER by first_name, first_name
+  LIMIT 10
   ")
 ```
 
-## Use SQL
+## Use SQL directly
 
 ```{sql, connection = con}
 SELECT actor_id, first_name, last_name
 FROM actor
 ORDER by first_name, first_name
+LIMIT 10
 ```
 
-
 ## Exercise 2
-Retrive the actor ID, first name, and last name for actors whose last name equals ‘WILLIAMS’ or ‘DAVIS’.
+Retrieve the actor ID, first name, and last name for actors whose last name equals ‘WILLIAMS’ or ‘DAVIS’.
 
 ```{r}
 dbGetQuery(con,
   "
   SELECT actor_id, first_name, last_name
   FROM actor
-  WHERE first_name = 'WILLIAMS'
+  WHERE last_name IN ('WILLIAMS', 'DAVIS')
   ")
 ```
 
+```{sql, connection = con}
+SELECT actor_id, first_name, last_name
+FROM actor
+WHERE last_name IN ('WILLIAMS', 'DAVIS')
+```
+
+## Exercise 3
+Write a query against the rental table that returns the IDs of the customers who rented a film on July 5, 2005 (use the rental.rental_date column, and you can use the date() function to ignore the time component). Include a single row for each distinct customer ID.
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT DISTINCT customer_id, rental_date
+  FROM rental
+  WHERE date(rental_date) = '2005-07-05'
+  LIMIT 10
+  ")
+```
+
+```{r}
+#dbGetQuery(con,
+#  "
+#  SELECT customer_id, COUNT(*) AS N
+#  FROM rental
+#  WHERE date(rental_date) = '2005-07-05'
+#  GROUP BY customer_id
+#  ")
+```
+
+```{sql, connection = con}
+SELECT DISTINCT customer_id, rental_date
+FROM rental
+WHERE date(rental_date) = '2005-07-05'
+LIMIT 10
+```
+
+## Exercise 4
+### Exercise 4.1
+Construct a query that retrieve all rows from the payment table where the amount is either 1.99, 7.99, 9.99.
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT  *
+  FROM payment
+  WHERE amount IN (1.99, 7.99, 9.99)
+  LIMIT 10
+  ")
+```
+
+```{sql, connection = con}
+SELECT  *
+FROM payment
+WHERE amount IN (1.99, 7.99, 9.99)
+LIMIT 10
+```
+
+### Exercise 4.2
+Construct a query that retrieve all rows from the payment table where the amount is greater then 5
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT  *
+  FROM payment
+  WHERE amount > 5
+  LIMIT 10
+  ")
+```
+
+```{sql, connection = con}
+SELECT  *
+FROM payment
+WHERE amount > 5
+LIMIT 10
+```
+### Exercise 4.3
+Construct a query that retrives all rows from the payment table where the amount is greater then 5 and less then 8
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT  *
+  FROM payment
+  WHERE amount > 5 AND amount < 8
+  LIMIT 10
+  ")
+```
+
+```{sql, connection = con}
+SELECT  *
+FROM payment
+WHERE amount > 5 AND amount < 8
+LIMIT 10
+```
+
+## Exercise 5
+Retrieve all the payment IDs and their amount from the customers whose last name is ‘DAVIS’.
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT c.customer_id, c.last_name, p.payment_id, p.amount
+  FROM customer AS c INNER JOIN payment AS p
+  ON c.customer_id = p.customer_id
+  WHERE c.last_name = 'DAVIS'
+  /*WHERE c.last_name IN ('DAVIS')*/
+  ")
+```
+
+```{sql, connection = con}
+SELECT c.customer_id, c.last_name, p.payment_id, p.amount
+FROM customer AS c INNER JOIN payment AS p
+ON c.customer_id = p.customer_id
+WHERE c.last_name = 'DAVIS'
+```
+
+## Exercise 6
+### Exercise 6.1
+Use COUNT(*) to count the number of rows in rental
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT  COUNT(*) AS N
+  FROM rental
+  ")
+```
+
+```{sql, connection = con}
+SELECT  COUNT(*) AS N
+FROM rental
+```
+
+### Exercise 6.2
+Use COUNT(*) and GROUP BY to count the number of rentals for each customer_id
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT customer_id, COUNT(*) AS N
+  FROM rental
+  GROUP BY customer_id
+  LIMIT 10
+  ")
+```
+
+```{sql, connection = con}
+SELECT customer_id, COUNT(*) AS N
+FROM rental
+GROUP BY customer_id
+LIMIT 10
+```
+
+### Exercise 6.3
+Repeat the previous query and sort by the count in descending order
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT customer_id, COUNT(*) AS N
+  FROM rental
+  GROUP BY customer_id
+  ORDER BY N DESC
+  LIMIT 10
+  ")
+```
+
+```{sql, connection = con}
+SELECT customer_id, COUNT(*) AS N
+FROM rental
+GROUP BY customer_id
+ORDER BY N DESC
+LIMIT 10
+```
+
+### Exercise 6.4
+Repeat the previous query but use HAVING to only keep the groups with 40 or more.
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT customer_id, COUNT(*) AS N
+  FROM rental
+  GROUP BY customer_id
+  HAVING N >= 40
+  ORDER BY N DESC
+  LIMIT 10
+  ")
+```
+
+```{sql, connection = con}
+SELECT customer_id, COUNT(*) AS N
+FROM rental
+GROUP BY customer_id
+HAVING N >= 40
+ORDER BY N DESC
+LIMIT 10
+```
+
+## Exercise 7
+The following query calculates a number of summary statistics for the payment table using MAX, MIN, AVG and SUM
+
+### Exercise 7.1
+Modify the above query to do those calculations for each customer_id
+
+```{r}
+dbGetQuery(con,
+  "
+  SELECT customer_id,
+    MAX(amount) AS max,
+    MIN(amount) AS min,
+    AVG(amount) AS avg,
+    SUM(amount) AS sum
+  FROM payment
+  ")
+```
+
+```{sql, connection = con}
+SELECT customer_id,
+    MAX(amount) AS max,
+    MIN(amount) AS min,
+    AVG(amount) AS avg,
+    SUM(amount) AS sum
+FROM payment
+```
+
+### Exercise 7.2
+Modify the above query to only keep the customer_ids that have more then 5 payments
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Cleanup
+Run the following chunk to disconnect from the connection.
 ```{r}
 # clean up
 dbDisconnect(con)
