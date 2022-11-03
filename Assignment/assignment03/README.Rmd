@@ -36,7 +36,7 @@ counts <- as.character(counts)
 stringr::str_extract(counts, "[0-9,]+")
 ```
 
-I was able to find 3,997 papers that show up under the term “sars-cov-2 trial vaccine.”
+I was able to find 4,005 papers that show up under the term “sars-cov-2 trial vaccine.”
 
 ## Using the list of pubmed ids you retrieved, download each papers’ details using the query parameter rettype = abstract. If you get more than 250 ids, just keep the first 250.
 
@@ -157,7 +157,8 @@ database <- data.frame(
   Day      = days,
   Abstract = abstracts
 )
-knitr::kable(database[1:3,], caption = "Some papers about sars-cov-2 trial vaccine.")
+knitr::kable(database[1:3,], align = "lllllll", caption = "Some papers about sars-cov-2 trial vaccine")
+
 ```
 
 # Text Mining
