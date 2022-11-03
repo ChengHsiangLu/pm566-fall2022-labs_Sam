@@ -33,14 +33,13 @@ trial vaccine.”
 ## Using the list of pubmed ids you retrieved, download each papers’ details using the query parameter rettype = abstract. If you get more than 250 ids, just keep the first 250.
 
 ``` r
-library(httr)
 query_ids <- GET(
   url   = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
   query = list(
-    db      = "pubmed",
-    term = "sars-cov-2 trial vaccine.",
-    rettype = "abstract",
-    retmax  = 250)
+    db     = "pubmed", 
+    term   = "sars-cov-2 trial vaccine", 
+    retmax = 250
+    )
 )
 
 # Extracting the content of the response of GET
@@ -334,7 +333,7 @@ pm %>%
 
 ![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
-Althought we may tokenize the abstracts into bigrams, I was wondering
+Although we may tokenize the abstracts into bigrams, I was wondering
 whether I can remove those stop words in bigrams.
 
 3.  Calculate the TF-IDF value for each word-search term combination.

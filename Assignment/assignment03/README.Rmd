@@ -41,14 +41,14 @@ I was able to find 4,005 papers that show up under the term “sars-cov-2 trial 
 ## Using the list of pubmed ids you retrieved, download each papers’ details using the query parameter rettype = abstract. If you get more than 250 ids, just keep the first 250.
 
 ```{r}
-library(httr)
+
 query_ids <- GET(
   url   = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
   query = list(
-    db      = "pubmed",
-    term = "sars-cov-2 trial vaccine.",
-    rettype = "abstract",
-    retmax  = 250)
+    db     = "pubmed", 
+    term   = "sars-cov-2 trial vaccine", 
+    retmax = 250
+    )
 )
 
 # Extracting the content of the response of GET
@@ -239,7 +239,7 @@ pm %>%
   geom_col()
 ```
 
-Althought we may tokenize the abstracts into bigrams, I was wondering whether I can remove those stop words in bigrams.
+Although we may tokenize the abstracts into bigrams, I was wondering whether I can remove those stop words in bigrams.
 
 3. Calculate the TF-IDF value for each word-search term combination. (here you want the search term to be the “document”) What are the 5 tokens from each search term with the highest TF-IDF value? How are the results different from the answers you got in question 1?
 
