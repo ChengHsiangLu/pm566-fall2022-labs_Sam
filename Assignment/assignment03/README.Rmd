@@ -161,6 +161,8 @@ knitr::kable(database[1:3,], align = "lllllll", caption = "Some papers about sar
 
 ```
 
+I was able to get Year, Month, and Day. However, I still have to find out a way to merge them.
+
 # Text Mining
 
 ```{r install-libraries}
@@ -199,7 +201,7 @@ pm %>%
   geom_col()
 ```
 
-I can only find "covid" and "19" which are interesting because there are lots of stop words.
+I can only find "covid" and "19" which are interesting because there are lots of stop words. It would be nice to remove stop words.
 
 ```{r}
 pm %>%
@@ -211,7 +213,7 @@ pm %>%
   geom_col()
 ```
 
-Yes, it does. After removing stop words, the word "covid" became the most frequent word.
+After removing stop words, the word "covid" became the most frequent word and we can also find there are other interesting words appeared to the top 10 list.
 
 ```{r top5, cache = TRUE}
 pm %>%
@@ -224,7 +226,7 @@ pm %>%
 knitr::kable()
 ```
 
-After removing stop words, I created a list with the 5 most common tokens for each search term.
+After removing stop words, I created a list with the 5 most common tokens for each search term. We can understand that each search term contains its own related words from this list.
 
 2. Tokenize the abstracts into bigrams. Find the 10 most common bigram and visualize them with ggplot2.
 
@@ -236,6 +238,8 @@ pm %>%
   ggplot(aes(n, fct_reorder(ngram, n))) +
   geom_col()
 ```
+
+Althought we may tokenize the abstracts into bigrams, I was wondering whether I can remove those stop words in bigrams.
 
 3. Calculate the TF-IDF value for each word-search term combination. (here you want the search term to be the “document”) What are the 5 tokens from each search term with the highest TF-IDF value? How are the results different from the answers you got in question 1?
 

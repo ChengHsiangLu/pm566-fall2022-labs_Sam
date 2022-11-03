@@ -1,7 +1,7 @@
 assignment03
 ================
 sl
-2022-11-02
+2022-11-03
 
 ``` r
 setwd("/Users/samuellu/Desktop/PM566/GitHub/pm566-fall2022-labs_Sam/Assignment/assignment03/")
@@ -25,7 +25,7 @@ counts <- as.character(counts)
 stringr::str_extract(counts, "[0-9,]+")
 ```
 
-    ## [1] "4,005"
+    ## [1] "4,006"
 
 I was able to find 4,005 papers that show up under the term “sars-cov-2
 trial vaccine.”
@@ -175,6 +175,9 @@ knitr::kable(database[1:3,], align = "lllllll", caption = "Some papers about sar
 
 Some papers about sars-cov-2 trial vaccine
 
+I was able to get Year, Month, and Day. However, I still have to find
+out a way to merge them.
+
 # Text Mining
 
 ``` r
@@ -255,7 +258,7 @@ pm %>%
 ![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 I can only find “covid” and “19” which are interesting because there are
-lots of stop words.
+lots of stop words. It would be nice to remove stop words.
 
 ``` r
 pm %>%
@@ -269,8 +272,9 @@ pm %>%
 
 ![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
-Yes, it does. After removing stop words, the word “covid” became the
-most frequent word.
+After removing stop words, the word “covid” became the most frequent
+word and we can also find there are other interesting words appeared to
+the top 10 list.
 
 ``` r
 pm %>%
@@ -313,7 +317,8 @@ knitr::kable()
 | prostate cancer | disease      |  652 |
 
 After removing stop words, I created a list with the 5 most common
-tokens for each search term.
+tokens for each search term. We can understand that each search term
+contains its own related words from this list.
 
 2.  Tokenize the abstracts into bigrams. Find the 10 most common bigram
     and visualize them with ggplot2.
@@ -328,6 +333,9 @@ pm %>%
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+Althought we may tokenize the abstracts into bigrams, I was wondering
+whether I can remove those stop words in bigrams.
 
 3.  Calculate the TF-IDF value for each word-search term combination.
     (here you want the search term to be the “document”) What are the 5
