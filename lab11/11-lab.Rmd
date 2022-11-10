@@ -14,7 +14,7 @@ always_allow_html: true
 ```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
 library(data.table)
 library(tidyverse)
-library(dplyr)
+library(dplyr) 
 library(plotly)
 library(knitr)
 library(widgetframe)
