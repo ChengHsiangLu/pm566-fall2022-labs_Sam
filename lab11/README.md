@@ -15,7 +15,7 @@ always_allow_html: true
 ```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
 library(data.table)
 library(tidyverse)
-library(dplyr)
+library(dplyr) 
 library(plotly)
 library(knitr)
 library(widgetframe)
@@ -384,7 +384,7 @@ plot_ly(x=colnames(cv_states_mat2), y=rownames(cv_states_mat2),
 - Plot the two maps together using `subplot()`. Make sure the shading is for the same range of values (google is your friend for this)
 - Describe the difference in the pattern of the CFR.
 
-```{r, eval=FALSE}
+```{r}
 
 ### For specified date
 
