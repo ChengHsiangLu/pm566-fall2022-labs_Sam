@@ -8,7 +8,7 @@ editor_options:
 always_allow_html: true
 ---
 
-** HTML Report: ** [**click here**](https://rawcdn.githack.com/ChengHsiangLu/pm566-fall2022-labs_Sam/9e446b0ec73d558006f69f4b8839d4cf83ab1779/lab11/11-lab.html)
+** HTML Report: ** [**click here**](https://rawcdn.githack.com/ChengHsiangLu/pm566-fall2022-labs_Sam/03dd628f489d034ce854468fbae4af027a3e67a5/lab11/11-lab.html)
 
 **And remember to set `eval=TRUE`**
 
