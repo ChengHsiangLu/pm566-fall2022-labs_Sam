@@ -8,7 +8,7 @@ editor_options:
 always_allow_html: true
 ---
 
-HTML Report: ** [**here**](https://rawcdn.githack.com/ChengHsiangLu/pm566-fall2022-labs_Sam/9e446b0ec73d558006f69f4b8839d4cf83ab1779/lab11/11-lab.html)
+** HTML Report: ** [**click here**](https://rawcdn.githack.com/ChengHsiangLu/pm566-fall2022-labs_Sam/9e446b0ec73d558006f69f4b8839d4cf83ab1779/lab11/11-lab.html)
 
 **And remember to set `eval=TRUE`**
 
@@ -332,13 +332,13 @@ Create a heatmap to visualize `new_cases` for each state on each date greater th
 - Repeat with `newper100k` variable. Now which states stand out? 
 - Create a second heatmap in which the pattern of `new_cases` for each state over time becomes more clear by filtering to only look at dates every two weeks 
 
-```{r, eval= FALSE}
+```{r}
 
 ### FINISH CODE HERE
 # Map state, date, and new_cases to a matrix
 library(tidyr)
 cv_states_mat <- cv_states %>% select(state, date, new_cases) %>% dplyr::filter(date>as.Date("2022-06-15"))
-cv_states_mat2 <- as.data.frame(pivot_wider(cv_states_mat, names_from = state, values_from = ________))
+cv_states_mat2 <- as.data.frame(pivot_wider(cv_states_mat, names_from = state, values_from = new_cases))
 rownames(cv_states_mat2) <- cv_states_mat2$date
 cv_states_mat2$date <- NULL
 cv_states_mat2 <- as.matrix(cv_states_mat2)
@@ -350,8 +350,8 @@ plot_ly(x=colnames(cv_states_mat2), y=rownames(cv_states_mat2),
              showscale=T)
 
 # Repeat with newper100k
-cv_states_mat <- cv_states %>% select(state, date, newper100k) %>% dplyr::filter(date>as.Date("2021-06-15"))
-cv_states_mat2 <- as.data.frame(pivot_wider(cv_states_mat, names_from = state, values_from = ________))
+cv_states_mat <- cv_states %>% select(state, date, newper100k) %>% dplyr::filter(date>as.Date("2022-06-15"))
+cv_states_mat2 <- as.data.frame(pivot_wider(cv_states_mat, names_from = state, values_from = newper100k))
 rownames(cv_states_mat2) <- cv_states_mat2$date
 cv_states_mat2$date <- NULL
 cv_states_mat2 <- as.matrix(cv_states_mat2)
@@ -362,10 +362,10 @@ plot_ly(x=colnames(cv_states_mat2), y=rownames(cv_states_mat2),
              showscale=T)
 
 # Create a second heatmap after filtering to only include dates every other week
-filter_dates <- seq(as.Date("2021-06-15"), as.Date("2021-11-01"), by=________)
+filter_dates <- seq(as.Date("2022-06-15"), as.Date("2022-11-01"), by="2 weeks")
 
 cv_states_mat <- cv_states %>% select(state, date, newper100k) %>% filter(date %in% filter_dates)
-cv_states_mat2 <- as.data.frame(pivot_wider(cv_states_mat, names_from = state, values_from = ________))
+cv_states_mat2 <- as.data.frame(pivot_wider(cv_states_mat, names_from = state, values_from = newper100k))
 rownames(cv_states_mat2) <- cv_states_mat2$date
 cv_states_mat2$date <- NULL
 cv_states_mat2 <- as.matrix(cv_states_mat2)
@@ -388,7 +388,7 @@ plot_ly(x=colnames(cv_states_mat2), y=rownames(cv_states_mat2),
 
 ### For specified date
 
-pick.date = "2021-10-15"
+pick.date = "2022-10-15"
 
 # Extract the data for each state by its abbreviation
 cv_per100 <- cv_states %>% filter(date==pick.date) %>% select(state, abb, newper100k, cases, deaths) # select data
@@ -397,7 +397,8 @@ cv_per100$state <- cv_per100$abb
 cv_per100$abb <- NULL
 
 # Create hover text
-cv_per100$hover <- with(cv_per100, paste(state_name, '<br>', "Cases per 100k: ", newper100k, '<br>', "Cases: ", cases, '<br>', "Deaths: ", deaths))
+cv_per100$hover <- with(cv_per100, 
+                        paste(state_name, '<br>', "Cases per 100k: ", newper100k, '<br>', "Cases: ", cases, '<br>', "Deaths: ", deaths))
 
 # Set up mapping details
 set_map_details <- list(
@@ -408,7 +409,7 @@ set_map_details <- list(
 )
 
 # Make sure both maps are on the same color scale
-shadeLimit <- 125
+shadeLimit <- 35
 
 # Create the map
 fig <- plot_geo(cv_per100, locationmode = 'USA-states') %>% 
@@ -458,7 +459,7 @@ fig_Today <- fig
 
 
 ### Plot together 
-________(fig_pick.date, fig_Today, nrows = 2, margin = .05)
+subplot(fig_pick.date, fig_Today, nrows = 2, margin = .05)
 
 ```
 
