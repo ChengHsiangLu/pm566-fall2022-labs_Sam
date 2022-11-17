@@ -1,7 +1,7 @@
 assignment04
 ================
 sl
-2022-11-13
+2022-11-17
 
 # HPC
 
@@ -106,9 +106,9 @@ microbenchmark::microbenchmark(
 ```
 
     ## Unit: microseconds
-    ##          expr     min       lq      mean   median       uq      max neval
-    ##     fun1(dat) 481.749 538.9875 584.97235 549.4150 574.9895 1000.732   100
-    ##  fun1alt(dat)  50.175  51.3220  59.21158  53.5515  60.1635  161.756   100
+    ##          expr     min       lq      mean   median      uq      max neval
+    ##     fun1(dat) 459.603 555.8705 656.15497 593.2965 710.753 1516.960   100
+    ##  fun1alt(dat)  50.573  52.8270  61.14281  58.1400  66.854  109.563   100
 
 ``` r
 # Test for the second
@@ -120,8 +120,8 @@ microbenchmark::microbenchmark(
 
     ## Unit: microseconds
     ##          expr      min       lq     mean   median       uq       max neval
-    ##     fun2(dat) 2881.863 3008.412 3463.173 3293.414 3601.989  6682.389   100
-    ##  fun2alt(dat)  740.931 1218.888 1951.322 1344.365 1794.025 28746.927   100
+    ##     fun2(dat) 2826.813 2930.907 3604.901 3087.062 3859.120  8043.586   100
+    ##  fun2alt(dat)  697.358 1124.958 2139.192 1237.115 2350.645 23749.656   100
 
 I have to remove unit = “relative” to avoid an error.
 
@@ -142,6 +142,9 @@ sim_pi(1000) # 3.132
 
     ## [1] 3.132
 
+In order to get accurate estimates, we can run this function multiple
+times, with the following code:
+
 ``` r
 # This runs the simulation a 4,000 times, each with 10,000 points
 set.seed(1231)
@@ -154,61 +157,37 @@ system.time({
     ## [1] 3.14124
 
     ##    user  system elapsed 
-    ##   4.212   1.110   5.370
+    ##   4.273   1.189   5.519
+
+Rewrite the previous code using parLapply() to make it run faster. Make
+sure you set the seed using clusterSetRNGStream():
 
 ``` r
 # YOUR CODE HERE
 library(parallel)
 
 # Setup
-cl <- makePSOCKcluster(4)  
-clusterSetRNGStream(cl, 123)
+cl <- makePSOCKcluster(2)  
+clusterSetRNGStream(cl, 1231)
 
 # Number of simulations we want each time to run
-nsim <- 1000
-
-# We need to make -nsim- and sim_pi available to the
-# cluster
-clusterExport(cl, c("nsim", "sim_pi"))
+nsim <- 10000
 
 system.time({
   # YOUR CODE HERE
-  ans <- parLapply(cl, 1:4000, sim_pi(nsim) )
+  ans <- unlist(parLapply(cl, 1:4000, sim_pi, nsim ))
   print(mean(ans))
   # YOUR CODE HERE
 })
 ```
 
+    ## [1] 3.141607
+
+    ##    user  system elapsed 
+    ##   0.005   0.000   0.940
+
 ``` r
-library(parallel)
-my_boot <- function(dat, stat, R, ncpus = 1L) {
-  
-  # Getting the random indices
-  n <- nrow(dat)
-  idx <- matrix(sample.int(n, n*R, TRUE), nrow=n, ncol=R)
- 
-  # Making the cluster using `ncpus`
-  # STEP 1: GOES HERE
-  cl <- makePSOCKcluster(4)  
-  clusterSetRNGStream(cl, 123) # Equivalent to `set.seed(123)`
-  
-  # STEP 2: GOES HERE
-  
-  clusterExport(cl, c("stat", "dat", "idx"), envir = environment())
-  
-    # STEP 3: THIS FUNCTION NEEDS TO BE REPLACES WITH parLapply
-  ans <- parLapply(cl, seq_len(R), function(i) {
-    stat(dat[idx[,i], , drop=FALSE])
-  })
-  
-  # Coercing the list into a matrix
-  ans <- do.call(rbind, ans)
-  
-  # STEP 4: GOES HERE
-  
-  ans
-  
-}
+stopCluster(cl)
 ```
 
 # SQL

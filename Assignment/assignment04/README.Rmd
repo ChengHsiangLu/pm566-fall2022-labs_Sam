@@ -103,6 +103,8 @@ set.seed(156)
 sim_pi(1000) # 3.132
 ```
 
+In order to get accurate estimates, we can run this function multiple times, with the following code:
+
 ```{r}
 # This runs the simulation a 4,000 times, each with 10,000 points
 set.seed(1231)
@@ -112,60 +114,26 @@ system.time({
 })
 ```
 
+Rewrite the previous code using parLapply() to make it run faster. Make sure you set the seed using clusterSetRNGStream():
+
 ```{r}
 # YOUR CODE HERE
 library(parallel)
 
 # Setup
-cl <- makePSOCKcluster(4)  
-clusterSetRNGStream(cl, 123)
+cl <- makePSOCKcluster(2)  
+clusterSetRNGStream(cl, 1231)
 
 # Number of simulations we want each time to run
-nsim <- 1000
-
-# We need to make -nsim- and sim_pi available to the
-# cluster
-clusterExport(cl, c("nsim", "sim_pi"))
+nsim <- 10000
 
 system.time({
   # YOUR CODE HERE
-  ans <- parLapply(cl, 1:4000, sim_pi(nsim) )
+  ans <- unlist(parLapply(cl, 1:4000, sim_pi, nsim ))
   print(mean(ans))
   # YOUR CODE HERE
 })
-
-```
-
-```{r}
-library(parallel)
-my_boot <- function(dat, stat, R, ncpus = 1L) {
-  
-  # Getting the random indices
-  n <- nrow(dat)
-  idx <- matrix(sample.int(n, n*R, TRUE), nrow=n, ncol=R)
- 
-  # Making the cluster using `ncpus`
-  # STEP 1: GOES HERE
-  cl <- makePSOCKcluster(4)  
-  clusterSetRNGStream(cl, 123) # Equivalent to `set.seed(123)`
-  
-  # STEP 2: GOES HERE
-  
-  clusterExport(cl, c("stat", "dat", "idx"), envir = environment())
-  
-    # STEP 3: THIS FUNCTION NEEDS TO BE REPLACES WITH parLapply
-  ans <- parLapply(cl, seq_len(R), function(i) {
-    stat(dat[idx[,i], , drop=FALSE])
-  })
-  
-  # Coercing the list into a matrix
-  ans <- do.call(rbind, ans)
-  
-  # STEP 4: GOES HERE
-  
-  ans
-  
-}
+stopCluster(cl)
 ```
 
 # SQL
@@ -196,12 +164,6 @@ dbWriteTable(con, "category", category)
 
 ## Question 1
 How many movies is there available in each rating category.
-
-```{sql, connection = con}
-#PRAGMA table_info(film)
-#PRAGMA table_info(film_category)
-#PRAGMA table_info(category)
-```
 
 ```{sql, connection = con}
 SELECT rating, COUNT(*) AS N
