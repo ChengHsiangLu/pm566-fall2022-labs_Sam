@@ -7,9 +7,6 @@ By merging these two dataset, I create different plots such as leaflets, boxplot
 ## Links
 
 You can see my webpage with this link:
-https://rawcdn.githack.com/ChengHsiangLu/PM566-finalproject/0dfaf57dac688cb43dabc2597ff04eae8534bdb6/index.html
-
-Download PDF:
-https://github.com/ChengHsiangLu/PM566-finalproject/raw/main/index.pdf
+https://rawcdn.githack.com/ChengHsiangLu/pm566-fall2022-labs_Sam/a8a8b0d27fa400df703696eee00f00685946d1a5/Assignment/assignment05/index.html
 
 

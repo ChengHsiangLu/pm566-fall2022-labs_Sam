@@ -8,8 +8,8 @@ navbar:
   right:
     - icon: fa-github fa-lg
       href: https://github.com/ChengHsiangLu/
-    - text: "PM566 Final Project"
-      href: https://github.com/ChengHsiangLu/PM566-finalproject
+    - text: "Assignment05"
+      href: https://rawcdn.githack.com/ChengHsiangLu/pm566-fall2022-labs_Sam/a8a8b0d27fa400df703696eee00f00685946d1a5/Assignment/assignment05/index.html
 output:
   html_document:
     theme: cosmo
