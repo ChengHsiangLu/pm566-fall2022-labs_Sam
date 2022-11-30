@@ -1,0 +1,302 @@
+---
+title: "The correlation of diabetes and obesity in the US in 2017"
+author: "Sam (Cheng-Hsiang) Lu"
+date: "`r Sys.Date()`"
+output: 
+        pdf_document: default
+        html_document:
+          toc: TRUE
+          toc_float: TRUE
+---
+
+<br>
+
+# **Introduction**
+
+In this assignment, I would like to see the correlation of diabetes and obesity with physical inactivity in the US in 2017. Thus, I download two datasets which are talking about "diagnosed diabetes among adults aged >=18 years" and "Obesity among adults aged >=18 years" in the US in 2017 from the CDC. They include estimates for the 500 largest US cities and approximately 28,000 census tracts within these cities.
+
+<br>
+
+```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
+library(data.table)
+library(tidyverse)
+library(dplyr)
+library(plotly)
+library(DT)
+library(knitr)
+library(lubridate)
+library(leaflet)
+library(dtplyr)
+library(ggplot2)
+library(stringr)
+library("RSocrata")
+
+# Initialize code chunk options
+opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  eval=TRUE,
+  echo = TRUE,
+  cache = FALSE,
+  fig.width = 7, 
+  fig.align = 'center',
+  fig.asp = 0.618,
+  out.width = "700px")
+```
+
+# **Methods**
+
+## Read in the data by API
+
+I used API method to obtain my datasets from CDC. First, you have to create an account with password. Then, you have to apply for a free app token. Last, copy your API Endpoint. Both datasets contain 27 columns and 29,006 rows. 
+
+Here are my datasets links:
+
+`https://chronicdata.cdc.gov/500-Cities-Places/500-Cities-Obesity-among-adults-aged-18-years/bjvu-3y7d`
+
+`https://chronicdata.cdc.gov/500-Cities-Places/500-Cities-Diagnosed-diabetes-among-adults-aged-18/cn78-b9bj`
+
+```{r API_dia, message=FALSE, echo=FALSE, warning=FALSE}
+dia <- read.socrata(
+  "https://chronicdata.cdc.gov/resource/cn78-b9bj.json?year=2017",
+  app_token = "bEkVW73ASzmTkZ9riAtf2YS5c",
+  email     = "clu74108@usc.edu",
+  password  = "Samuelsunny0325!"
+)
+dia <- as.data.table(dia)
+write.csv(dia,"dia.csv", row.names = F)
+```
+
+```{r API_obe, message=FALSE, echo=FALSE, warning=FALSE}
+obe <- read.socrata(
+  "https://chronicdata.cdc.gov/resource/bjvu-3y7d.json?year=2017",
+  app_token = "bEkVW73ASzmTkZ9riAtf2YS5c",
+  email     = "clu74108@usc.edu",
+  password  = "Samuelsunny0325!"
+)
+obe <- as.data.table(obe)
+write.csv(obe,"obe.csv", row.names = F)
+```
+
+<br>
+
+## Select columns
+
+From CDC datasets, I select **data_value(%), populationCount, stateabbr, statedesc(state name), city_name, geolocation.latitude, and geolocation.longitude** total 7 columns.
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+dia_mini <- dia[, c(2, 3, 14, 17, 19, 20, 23)]
+obe_mini <- obe[, c(2, 3, 14, 17, 19, 20, 23)]
+```
+
+<br>
+
+## Change column names
+I change my column names in order to easily understand. In diabetes and obesity datasets, I have  **diabetes_percentage/obesity_percentage, populationCount, state_abbr, state_name, city_name, lat, and lon**.
+
+```{r}
+colnames(dia_mini)[1] <- "diabetes_percentage"
+colnames(dia_mini)[2] <- "populationCount"
+colnames(dia_mini)[3] <- "state_abbr"
+colnames(dia_mini)[4] <- "state_name"
+colnames(dia_mini)[5] <- "city_name"
+colnames(dia_mini)[6] <- "lat"
+colnames(dia_mini)[7] <- "lon"
+
+colnames(obe_mini)[1] <- "obesity_percentage"
+colnames(obe_mini)[2] <- "populationCount"
+colnames(obe_mini)[3] <- "state_abbr"
+colnames(obe_mini)[4] <- "state_name"
+colnames(obe_mini)[5] <- "city_name"
+colnames(obe_mini)[6] <- "lat"
+colnames(obe_mini)[7] <- "lon"
+```
+
+<br>
+
+## Merge two datasets
+
+Merge CDC two datasets by **state_abbr, populationCount, state_name, city_name, lat, and lon**. Then I merge the Physical Inactivity dataset with them.
+
+```{r merge-datatables}
+merged <- 
+  merge(
+  # Data
+  x     = dia_mini,      
+  y     = obe_mini, 
+  # List of variables to match
+ by = c("state_abbr","populationCount", "state_name", "city_name", "lat", "lon"),
+  # keep everything!
+  all.x = TRUE     
+  ) 
+```
+
+## Remove duplicates
+
+```{r}
+dim(merged)
+```
+
+My row number increased to 30,008 so I have to remove duplicates.
+
+```{r}
+merged[, n := 1:.N, by = .(state_abbr, state_name, city_name, lat, lon)]
+merged <- merged[n == 1,][, n := NULL]
+
+dim(merged)
+```
+
+After removing duplicates, my rows shrink from 30,008 to 28,505.
+
+<br>
+
+## Convert chr into num
+
+In this step, I just convert character variables into numeric variables.
+
+```{r}
+merged$lat <- as.numeric(merged$lat)
+merged$lon <- as.numeric(merged$lon)
+merged$diabetes_percentage <- as.numeric(merged$diabetes_percentage)
+merged$populationCount <- as.numeric(merged$populationCount)
+merged$obesity_percentage <- as.numeric(merged$obesity_percentage)
+```
+
+<br>
+
+## Check NAs
+
+In my merged dataset, there are only 2.7% NAs values in columns of **diabetes_percentage and obesity_percentage**. Therefore, I'm going to remove them.
+
+```{r}
+mean(is.na(merged$diabetes_percentage))
+mean(is.na(merged$obesity_percentage))
+```
+
+```{r}
+merged <-merged[!is.na(merged$diabetes_percentage),]
+merged <-merged[!is.na(merged$obesity_percentage),]
+```
+
+<br>
+
+## Add regions
+
+Last, I create a new column contain Northeast, Northwest, Southwest, and Southeast four different regions.
+
+```{r}
+# Add regions
+merged[, region := fifelse(lon >= -98 & lat > 39.71, "NE",
+                fifelse(lon < -98 & lat > 39.71, "NW",
+                fifelse(lon < -98 & lat <= 39.71, "SW","SE")))
+   ]
+table(merged$region)
+```
+
+<br>
+
+# **Results**
+
+## Leaflet
+
+```{r pal_dia}
+pal_dia <- colorNumeric(c('darkblue','goldenrod','darkred'), domain=merged$diabetes_percentage)
+```
+
+```{r p1_leaflet}
+# Diabetes percentage in the US
+p1_leaflet <- leaflet() %>%
+  addProviderTiles('OpenStreetMap') %>% 
+  addCircles(data = merged,
+             lat=~lat,lng=~lon,
+             label = ~paste0(round(diabetes_percentage,2)), color = ~ pal_dia(diabetes_percentage),
+             opacity = 0.5, fillOpacity = 1, radius = 50) %>%
+  # Legend
+  addLegend('bottomleft', pal=pal_dia, values=merged$diabetes_percentage,
+             title='Diabetes percentage', opacity=1)
+
+p1_leaflet
+```
+
+From the Leaflet, the legend shows the degree of the diabetes percentage. The red color means higher percentage of diabetes. I see there are more orange dots in the NE region and SE region from the plot of diabetes percentage.
+<br>
+
+## Boxplots
+
+```{r}
+merged$region <- factor(merged$region, levels=c("NE", "SE", "NW", "SW"))
+```
+
+```{r p1_box}
+p1_box <- merged[!is.na(diabetes_percentage)][!is.na(region)] %>% 
+  plot_ly(x = ~region, y= ~diabetes_percentage,
+        type = 'box', mode = 'markers', color = ~region,
+        hoverinfo = 'text',
+        text = ~paste( paste(" State name: ", state_name, sep=""),
+                       paste(" Region: ", region, sep=""),
+                       paste("City name: ", city_name, sep=""),
+                       paste(" Diabetes percentage: ", diabetes_percentage, sep=""), 
+                       sep = "<br>")) %>%
+  layout(title = "Diabetes percentage in different regions",
+         xaxis = list(title = "Regions"), 
+         yaxis = list(title = "Diabetes percentage"),
+         hovermode = "compare")
+
+p1_box
+```
+
+Now, let see the boxplot, the x-axis shows 4 regions: Northeast, Southeast, Northwest, and Southwest. On the y-axis shows the percentage of diabetes or obesity.
+
+From the boxplot of diabetes percentage, there is a max diabetes percentage in the NE region, and the NE region and the SE region have a similar median diabetes percentage. The NW region has the lowest median diabetes percentage. In this plot, the east-side regions' median diabetes percentage is higher than the west-side regions'.
+
+<br>
+
+## Scatter plots
+
+```{r}
+merged_median <- merged[, .(
+    obe_median      = median(obesity_percentage, na.rm=TRUE),
+    dia_median      = median(diabetes_percentage, na.rm=TRUE)
+    ),
+    by = c("state_abbr", "state_name", "region")
+    ]
+```
+
+```{r}
+merged_median_uni <- unique(merged_median)
+```
+
+```{r}
+scatter_p <- merged_median_uni %>% 
+  plot_ly(x = ~obe_median, y = ~dia_median,
+          type = 'scatter', mode = 'markers', color = ~state_abbr,
+          hoverinfo = 'text',
+          text = ~paste( paste(state_name, ":", sep=""), 
+                  paste(" State_abbr: ", state_abbr, sep=""), 
+                  paste(" Region: ", region, sep=""), 
+                  paste(" Obesity percentage: ", obe_median, sep=""), 
+                  paste(" Diabetes percentage: ", dia_median, sep=""),
+                  sep = "<br>")) %>%
+  layout(title = "Obesity percentage vs. Diabetes percentage",
+         xaxis = list(title = "Obesity percentage"), 
+         yaxis = list(title = "Diabetes percentage"),
+         hovermode = "compare")
+
+scatter_p
+```
+
+In this scatter plot, I select each state's median of obesity percentage and diabetes percentage. We can see that there is a positive correlation between obesity and diabetes rates.
+
+<br>
+
+# **Conclusion**
+
+## Question 1: How are the distribution of diabetes and obesity percentages in the US?
+
+From the leaflet,  first we can see there are more orange dots on the NE and SE regions. From the box plot, the median of diabetes percentage looks equally high in the NE and SE regions. Besides, we can also see there are higher diabetes percentages on the east-side than on the west-side.
+
+## Question 2: Is there any correlation between diabetes and obesity?
+
+From the scatter plot, we can see that there is a positive correlation between obesity and diabetes rates by states.
+
+<br>

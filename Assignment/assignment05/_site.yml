@@ -1,0 +1,18 @@
+name: "Assignment05"
+output_dir: "."
+navbar:
+  title: "Assignment05"
+  left:
+    - text: "Home"
+      href: index.html
+  right:
+    - icon: fa-github fa-lg
+      href: https://github.com/ChengHsiangLu/
+    - text: "PM566 Final Project"
+      href: https://github.com/ChengHsiangLu/PM566-finalproject
+output:
+  html_document:
+    theme: cosmo
+    include:
+      after_body: footer.html
+    css: styles.css
