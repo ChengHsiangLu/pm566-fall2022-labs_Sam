@@ -1,5 +1,5 @@
 ---
-title: "The correlation of diabetes and obesity in the US in 2017"
+title: "assignment05"
 author: "Sam (Cheng-Hsiang) Lu"
 date: "`r Sys.Date()`"
 output: 
@@ -78,23 +78,12 @@ obe <- as.data.table(obe)
 write.csv(obe,"obe.csv", row.names = F)
 ```
 
-<br>
-
-## Select columns
-
-From CDC datasets, I select **data_value(%), populationCount, stateabbr, statedesc(state name), city_name, geolocation.latitude, and geolocation.longitude** total 7 columns.
-
 ```{r message=FALSE, echo=FALSE, warning=FALSE}
 dia_mini <- dia[, c(2, 3, 14, 17, 19, 20, 23)]
 obe_mini <- obe[, c(2, 3, 14, 17, 19, 20, 23)]
 ```
 
-<br>
-
-## Change column names
-I change my column names in order to easily understand. In diabetes and obesity datasets, I have  **diabetes_percentage/obesity_percentage, populationCount, state_abbr, state_name, city_name, lat, and lon**.
-
-```{r}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 colnames(dia_mini)[1] <- "diabetes_percentage"
 colnames(dia_mini)[2] <- "populationCount"
 colnames(dia_mini)[3] <- "state_abbr"
@@ -112,13 +101,7 @@ colnames(obe_mini)[6] <- "lat"
 colnames(obe_mini)[7] <- "lon"
 ```
 
-<br>
-
-## Merge two datasets
-
-Merge CDC two datasets by **state_abbr, populationCount, state_name, city_name, lat, and lon**. Then I merge the Physical Inactivity dataset with them.
-
-```{r merge-datatables}
+```{r merge-datatables, message=FALSE, echo=FALSE, warning=FALSE}
 merged <- 
   merge(
   # Data
@@ -131,30 +114,18 @@ merged <-
   ) 
 ```
 
-## Remove duplicates
-
-```{r}
-dim(merged)
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+#dim(merged)
 ```
 
-My row number increased to 30,008 so I have to remove duplicates.
-
-```{r}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 merged[, n := 1:.N, by = .(state_abbr, state_name, city_name, lat, lon)]
 merged <- merged[n == 1,][, n := NULL]
 
-dim(merged)
+#dim(merged)
 ```
 
-After removing duplicates, my rows shrink from 30,008 to 28,505.
-
-<br>
-
-## Convert chr into num
-
-In this step, I just convert character variables into numeric variables.
-
-```{r}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 merged$lat <- as.numeric(merged$lat)
 merged$lon <- as.numeric(merged$lon)
 merged$diabetes_percentage <- as.numeric(merged$diabetes_percentage)
@@ -162,48 +133,38 @@ merged$populationCount <- as.numeric(merged$populationCount)
 merged$obesity_percentage <- as.numeric(merged$obesity_percentage)
 ```
 
-<br>
-
-## Check NAs
-
-In my merged dataset, there are only 2.7% NAs values in columns of **diabetes_percentage and obesity_percentage**. Therefore, I'm going to remove them.
-
-```{r}
-mean(is.na(merged$diabetes_percentage))
-mean(is.na(merged$obesity_percentage))
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+#mean(is.na(merged$diabetes_percentage))
+#mean(is.na(merged$obesity_percentage))
 ```
 
-```{r}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 merged <-merged[!is.na(merged$diabetes_percentage),]
 merged <-merged[!is.na(merged$obesity_percentage),]
 ```
 
-<br>
-
-## Add regions
-
-Last, I create a new column contain Northeast, Northwest, Southwest, and Southeast four different regions.
-
-```{r}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 # Add regions
 merged[, region := fifelse(lon >= -98 & lat > 39.71, "NE",
                 fifelse(lon < -98 & lat > 39.71, "NW",
                 fifelse(lon < -98 & lat <= 39.71, "SW","SE")))
    ]
-table(merged$region)
+#table(merged$region)
 ```
 
 <br>
+
+After downloading two datasets, I merge them, remove duplicates and NA values, and add a new column of regions.
 
 # **Results**
 
 ## Leaflet
 
-```{r pal_dia}
+```{r pal_dia, message=FALSE, echo=FALSE, warning=FALSE}
 pal_dia <- colorNumeric(c('darkblue','goldenrod','darkred'), domain=merged$diabetes_percentage)
 ```
 
-```{r p1_leaflet}
+```{r p1_leaflet, message=FALSE, echo=FALSE, warning=FALSE}
 # Diabetes percentage in the US
 p1_leaflet <- leaflet() %>%
   addProviderTiles('OpenStreetMap') %>% 
@@ -223,11 +184,11 @@ From the Leaflet, the legend shows the degree of the diabetes percentage. The re
 
 ## Boxplots
 
-```{r}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 merged$region <- factor(merged$region, levels=c("NE", "SE", "NW", "SW"))
 ```
 
-```{r p1_box}
+```{r p1_box, message=FALSE, echo=FALSE, warning=FALSE}
 p1_box <- merged[!is.na(diabetes_percentage)][!is.na(region)] %>% 
   plot_ly(x = ~region, y= ~diabetes_percentage,
         type = 'box', mode = 'markers', color = ~region,
@@ -253,7 +214,7 @@ From the boxplot of diabetes percentage, there is a max diabetes percentage in t
 
 ## Scatter plots
 
-```{r}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 merged_median <- merged[, .(
     obe_median      = median(obesity_percentage, na.rm=TRUE),
     dia_median      = median(diabetes_percentage, na.rm=TRUE)
@@ -262,11 +223,11 @@ merged_median <- merged[, .(
     ]
 ```
 
-```{r}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 merged_median_uni <- unique(merged_median)
 ```
 
-```{r}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 scatter_p <- merged_median_uni %>% 
   plot_ly(x = ~obe_median, y = ~dia_median,
           type = 'scatter', mode = 'markers', color = ~state_abbr,
