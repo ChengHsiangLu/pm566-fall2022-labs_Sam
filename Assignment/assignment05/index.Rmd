@@ -52,9 +52,9 @@ I used API method to obtain my datasets from CDC. First, you have to create an a
 
 Here are my datasets links:
 
-`https://chronicdata.cdc.gov/500-Cities-Places/500-Cities-Obesity-among-adults-aged-18-years/bjvu-3y7d`
+[500 Cities: Obesity among adults aged >=18 years](https://chronicdata.cdc.gov/500-Cities-Places/500-Cities-Obesity-among-adults-aged-18-years/bjvu-3y7d)
 
-`https://chronicdata.cdc.gov/500-Cities-Places/500-Cities-Diagnosed-diabetes-among-adults-aged-18/cn78-b9bj`
+[500 Cities: Diagnosed diabetes among adults aged >=18 years](https://chronicdata.cdc.gov/500-Cities-Places/500-Cities-Diagnosed-diabetes-among-adults-aged-18/cn78-b9bj)
 
 ```{r API_dia, message=FALSE, echo=FALSE, warning=FALSE}
 dia <- read.socrata(
@@ -208,7 +208,7 @@ p1_box
 
 Now, let see the boxplot, the x-axis shows 4 regions: Northeast, Southeast, Northwest, and Southwest. On the y-axis shows the percentage of diabetes or obesity.
 
-From the boxplot of diabetes percentage, there is a max diabetes percentage in the NE region, and the NE region and the SE region have a similar median diabetes percentage. The NW region has the lowest median diabetes percentage. In this plot, the east-side regions' median diabetes percentage is higher than the west-side regions'.
+From the boxplot of diabetes percentage, the NE region and the SE region have a similar median diabetes percentage. The NW region has the lowest median diabetes percentage. In this plot, the east-side regions' median diabetes percentage is higher than the west-side regions'.
 
 <br>
 
@@ -252,9 +252,9 @@ In this scatter plot, I select each state's median of obesity percentage and dia
 
 # **Conclusion**
 
-## Question 1: How are the distribution of diabetes and obesity percentages in the US?
+## Question 1: How are the distribution of diabetes percentages in the US?
 
-From the leaflet,  first we can see there are more orange dots on the NE and SE regions. From the box plot, the median of diabetes percentage looks equally high in the NE and SE regions. Besides, we can also see there are higher diabetes percentages on the east-side than on the west-side.
+From the leaflet, first we can see there are more orange dots on the NE and SE regions. From the box plot, the median of diabetes percentage looks equally high in the NE and SE regions. Besides, we can also see there are higher diabetes percentages on the east-side than on the west-side.
 
 ## Question 2: Is there any correlation between diabetes and obesity?
 
