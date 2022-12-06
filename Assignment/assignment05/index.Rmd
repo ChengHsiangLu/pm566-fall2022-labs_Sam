@@ -56,26 +56,33 @@ Here are my datasets links:
 
 [500 Cities: Diagnosed diabetes among adults aged >=18 years](https://chronicdata.cdc.gov/500-Cities-Places/500-Cities-Diagnosed-diabetes-among-adults-aged-18/cn78-b9bj)
 
-```{r API_dia, message=FALSE, echo=FALSE, warning=FALSE}
+```{r API_dia, eval=FALSE, message=FALSE, echo=FALSE, warning=FALSE}
 dia <- read.socrata(
   "https://chronicdata.cdc.gov/resource/cn78-b9bj.json?year=2017",
-  app_token = "bEkVW73ASzmTkZ9riAtf2YS5c",
-  email     = "clu74108@usc.edu",
-  password  = "Samuelsunny0325!"
+  app_token = "your_token",
+  email     = "your_email",
+  password  = "your_password"
 )
 dia <- as.data.table(dia)
 write.csv(dia,"dia.csv", row.names = F)
 ```
 
-```{r API_obe, message=FALSE, echo=FALSE, warning=FALSE}
+```{r API_obe, eval=FALSE, message=FALSE, echo=FALSE, warning=FALSE}
 obe <- read.socrata(
   "https://chronicdata.cdc.gov/resource/bjvu-3y7d.json?year=2017",
-  app_token = "bEkVW73ASzmTkZ9riAtf2YS5c",
-  email     = "clu74108@usc.edu",
-  password  = "Samuelsunny0325!"
+  app_token = "your_token",
+  email     = "your_email",
+  password  = "your_password"
 )
 obe <- as.data.table(obe)
 write.csv(obe,"obe.csv", row.names = F)
+```
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+dia <- read.csv("dia.csv")
+obe <- read.csv("obe.csv")
+dia <- as.data.table(dia)
+obe <- as.data.table(obe)
 ```
 
 ```{r message=FALSE, echo=FALSE, warning=FALSE}
